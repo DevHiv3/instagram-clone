@@ -30,8 +30,8 @@ export default async function Verification(req,res){
           port: 587,
           secure: false,
           auth: {
-             user: 'arnabgogoi83@gmail.com',
-             pass: 'erzs cmdi xlkv opkf'
+             user: process.env.EMAIL_USER,
+             pass: process.env.EMAIL_PASSKEY
             }
           });
 
