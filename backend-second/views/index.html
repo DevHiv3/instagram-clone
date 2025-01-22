@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO with Messages</title>
+</head>
+<body>
+  <h1>Socket.IO Frontend</h1>
+  <p id="status">Status: Not Connected</p>
+
+  <input type="text" id="messageInput" placeholder="Type your message" />
+  <button id="sendButton">Send</button>
+
+  <input type="text" id="roomInput" placeholder="Type your message" />
+
+  <h2>Messages</h2>
+  <div id="messages"></div>
+
+  <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+  <script>
+    const socket = io('http://localhost:8080');
+
+    const statusEl = document.getElementById('status');
+    const messagesEl = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const roomInput = document.getElementById('roomInput');
+    const sendButton = document.getElementById('sendButton');
+
+    // Update status when connected
+    socket.on('connect', () => {
+      console.log(`Connected with ID: ${socket.id}`);
+      statusEl.textContent = `Status: Connected (ID: ${socket.id})`;
+    });
+
+    // Update status when disconnected
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+      statusEl.textContent = 'Status: Disconnected';
+    });
+
+    // Send a message to the server
+    sendButton.addEventListener('click', () => {
+      const message = messageInput.value.trim();
+      const room = message
+      if (message) {
+        socket.emit('send-message', message); // Emit the 'message' event with the input value
+        messageInput.value = '';
+      } else if(room & message){
+        socket.emit('send-message', message, room);
+      }
+    });
+
+    // Receive messages from the server
+    socket.on('receive-message', (msg) => {
+      console.log('Message from server:', msg);
+      const messageEl = document.createElement('p');
+      messageEl.textContent = msg;
+      messagesEl.appendChild(messageEl); // Append received message to the messages div
+    });
+  </script>
+</body>
+</html>

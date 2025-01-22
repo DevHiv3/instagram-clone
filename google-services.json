@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "584881264042",
+    "project_id": "instagram-clone-hitartha",
+    "storage_bucket": "instagram-clone-hitartha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:584881264042:android:419571d60df5a6e6e4c7d3",
+        "android_client_info": {
+          "package_name": "com.instaclone.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqWFLoNFDVVWC9d1vbGNn3L44BPThdjzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
