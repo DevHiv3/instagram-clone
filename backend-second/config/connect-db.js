@@ -12,8 +12,3 @@ export default async function connectDB(){
   }
 }
 
-export const corsConfig = {
-  origin: ["http://localhost:8080", "https://admin.socket.io"],
-  methods: ["GET", "POST"],
-  credentials: true,
-}
