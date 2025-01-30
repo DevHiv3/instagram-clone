@@ -4,11 +4,11 @@
     "slug": "tinder-clone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/splash-screen-logo.webp",
+    "icon": "./assets/splash-screen-logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-screen-logo.webp",
+      "image": "./assets/splash-screen-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#2f2f2f"
     },
@@ -20,7 +20,7 @@
       "googleServicesFile": "./google-services.json",
       "useNextNotificationsApi": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/splash-screen-logo.webp",
+        "foregroundImage": "./assets/splash-screen-logo.png",
         "backgroundColor": "#2f2f2f"
       },
       "permissions": [

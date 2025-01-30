@@ -6,7 +6,7 @@ const localHostUrl = "http://192.168.29.244:8080"
 
 const initialState = {
     user: null,
-    base_url: localHostUrl,
+    base_url: productionUrl,
     }
 
 const authSlice = createSlice({
