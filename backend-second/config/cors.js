@@ -1,4 +1,4 @@
-const productionUrl = "https://instagram-clone-expo.vercel.app"
+const productionUrl = "https://instagram-clone-qoyv.onrender.com"
 const localHostUrl = "http://192.168.29.244:8080"
 const socketAdminUrl = "https://admin.socket.io"
 const socketUrl = "http://localhost:8080"

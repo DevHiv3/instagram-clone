@@ -4,9 +4,10 @@ import { useNavigation } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
 import tw from "twrnc"
+import Octicons from '@expo/vector-icons/Octicons';
 import { Ionicons, FontAwesome, Feather } from '@expo/vector-icons';
-import BottomNavigation from "../components/bottom-navigation";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { base_url as url } from '../slices/authSlice'
 
 const { width, height } = Dimensions.get("window")
@@ -18,9 +19,31 @@ export default function SearchScreen(){
     const base_url = useSelector(url)
 
     const [ query, setQuery ] = useState("")
+    const [ profile, setProfile ] = useState({})
     const [ userId, setUserId ] = useState("")
     const [ token, setToken ] = useState("")
     const [ users, setUsers ] = useState([])
+
+
+    const fetchProfile = async(token)=>{
+          const userId = await SecureStore.getItemAsync("id")
+          try{
+            const link = `${base_url}/user/${userId}`
+            const response = await fetch(link, {
+              method: "GET",
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+            })
+    
+            const result = await response.json()
+            setProfile(result)
+            
+          } catch(error){
+            console.error("Error: ", error)
+          }
+        }
 
     const follow = async(id)=>{
           const storedToken = await SecureStore.getItemAsync('token');
@@ -38,10 +61,28 @@ export default function SearchScreen(){
             
             if(result.message === "success"){
               ToastAndroid.show(`You have started following`, ToastAndroid.SHORT)
+              const urlLink = `${base_url}/create-notification`
+              await fetch(urlLink, {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+               },
+               body: JSON.stringify({
+                 message: `${profile.username} has started following you`,
+                 type: "Profile",
+                 action: "follow",
+                 id: profile.id,
+                 photo: profile.photo,
+                 receiver: id
+                })
+              })
               search()
             }
     
           } catch(error){
+            ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+            ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
             console.error("Error: ", error)
           }
         }
@@ -65,6 +106,8 @@ export default function SearchScreen(){
               search()
             }
           } catch(error){
+            ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+            ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
             console.error("Error: ", error)
           }
         }
@@ -77,7 +120,7 @@ export default function SearchScreen(){
               if (storedToken) {
                 setToken(storedToken)
                 setUserId(uid)
-                console.log(storedToken)
+                fetchProfile()
                 search()
               } else {
                 navigation.replace("Signup")
@@ -101,9 +144,10 @@ export default function SearchScreen(){
       
                 const result = await response.json()
                 setUsers(result.data)
-                console.log("all the searched users: ",result.data)
       
               } catch(error){
+                ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+                ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
                 console.error("Error: ", error)
               } finally {
                  setLoading(false)
@@ -155,7 +199,7 @@ export default function SearchScreen(){
            );
 
 const UserList = ({ user }) =>(
-  <TouchableOpacity onPress={()=> navigation.navigate("Profile", { id: user._id })} style={tw`flex flex-row w-full h-22 justify-between align-center border-white`}>
+        <TouchableOpacity onPress={()=> navigation.navigate("Profile", { id: user._id })} style={tw`flex flex-row w-full h-22 justify-between align-center border-white`}>
 
           <View style={tw`flex flex-row justify-center align-center h-20`}>
           <View style={tw`flex flex-col align-center justify-center ml-4`}>
@@ -163,7 +207,7 @@ const UserList = ({ user }) =>(
           </View>
             <View style={tw`flex flex-col align-center justify-center ml-4 `}>
               <Text style={tw`text-white text-lg font-semibold`}>{user.username}</Text>
-              <Text style={tw`text-gray-300`}>{user.email} <Text style={tw``}></Text>2d</Text>
+              <Text style={tw`text-gray-300`}>{user.email}</Text>
             </View>
           </View>
 
@@ -176,12 +220,7 @@ const UserList = ({ user }) =>(
 )
     
   return (
-
-    <BottomNavigation>
-
     <View style={styles.container}>
-
-      <ScrollView>
 
         <TouchableOpacity
         onPress={expandInput}
@@ -195,15 +234,23 @@ const UserList = ({ user }) =>(
 
       </TouchableOpacity>
     
-     {!query ? <FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={[1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]} renderItem={()=> <View />} key={3} numColumns={3} /> :   
+    
+     {!query ? 
+      <FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={[1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]} renderItem={()=> <View />} key={3} numColumns={3} /> :   
     <View style={tw`w-full h-full`}>
       {users.map((data)=> <UserList user={data} />)}
     </View>
     }
-      </ScrollView>
-      
+
+    <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>
+      <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Create")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Notification")}><AntDesign name="hearto" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=>{ navigation.navigate("Profile", { id: userId })}}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: profile.photo }} /></TouchableOpacity>
     </View>
-    </BottomNavigation>
+
+    </View>
    
 
   )
@@ -213,11 +260,23 @@ const UserList = ({ user }) =>(
 const styles = StyleSheet.create({
     container: {
    flex: 1,
-   backgroundColor: '#1f1f1f',
+   backgroundColor: '#000',
    height: height,
    width: width,
    paddingTop: 40,
  },
+ bottomBar: {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "space-evenly",
+  backgroundColor: "#000",
+  paddingVertical: 15,
+  position: "absolute",
+  bottom: 0,
+  width: "100%",
+  padding: 5,
+  alignItems: "center",
+},
  
  inputContainer: {
     width: '100%',
@@ -236,7 +295,7 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: '#2f2f2f',
+    backgroundColor: '#1f1f1f',
     shadowColor: '#171717',
     shadowOpacity: 0.2,
     shadowRadius: 3,

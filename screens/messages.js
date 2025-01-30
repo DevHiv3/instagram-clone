@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useLayoutEffect }
  from "react"
-import { StyleSheet, Text, View, SafeAreaView, Image, RefreshControl, ScrollView, TouchableOpacity, Dimensions, TouchableWithoutFeedback,Keyboard, Platform, KeyboardAvoidingView, TextInput, FlatList, } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, RefreshControl, ScrollView, TouchableOpacity, Dimensions, TouchableWithoutFeedback,Keyboard, Platform, KeyboardAvoidingView, TextInput, FlatList, ToastAndroid, } from 'react-native';
 import { Ionicons, FontAwesome, Feather } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from "@react-navigation/native";
 import { base_url as url } from '../slices/authSlice'
+import Modal from '../components/modal';
 import { useSelector } from 'react-redux';
-import { formatDistanceToNowStrict } from "date-fns";
+import { formatDistanceToNowStrict, formatDistanceToNow } from "date-fns";
 import { useFonts, Inter_900Black, Inter_100Thin,
   Inter_200ExtraLight,
   Inter_300Light,
@@ -19,77 +20,20 @@ import { useFonts, Inter_900Black, Inter_100Thin,
 
 const { width, height } = Dimensions.get("window")
 
-const messages = [
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  },
-  {
-    username: "Hitartha Gogoi",
-    photo: "https://randomuser.me/api/portraits/men/73.jpg",
-    type: "text",
-    message: "Happy new year!",
-    timestamp: "2d"
-  }
-]
+const truncateText = (text, maxLength) => {
+  return text.length > maxLength ? `${text.slice(0, maxLength)} ...` : text;
+};
+
+const maxLength = 10;
 
 export default function MessagesScreen(){
 
     const navigation = useNavigation()
     const base_url = useSelector(url)
     const [ token, setToken ] = useState("")
+    const [ selectedRoomId, setSelectedRoomId ] = useState("")
+    const [ selectedReceiver, setReceiver ] = useState("")
+    const [ open, setOpen ] = useState(false);
     const [ userId, setUserId ] = useState("")
     const [ rooms, setRooms ] = useState([])
     
@@ -99,7 +43,6 @@ export default function MessagesScreen(){
         
               if (storedToken) {
                 setToken(storedToken)
-                console.log(storedToken)
                 fetchRooms()
               } else {
                 navigation.replace("Signup")
@@ -149,6 +92,38 @@ export default function MessagesScreen(){
       }
     }
   
+  const deleteChat = async()=>{
+        const storedToken = await SecureStore.getItemAsync('token');
+        const userId = await SecureStore.getItemAsync("id")
+        try{
+          const link = `${base_url}/room/${selectedRoomId}`
+          const response = await fetch(link, {
+            method: "DELETE",
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${storedToken}`
+            },
+            body: JSON.stringify({ sender: userId, receiver: selectedReceiver })
+          })
+          
+          const result = await response.json()
+          if(result.message == "success"){
+            ToastAndroid.show("Chat deleted!", ToastAndroid.SHORT)
+            setReceiver("");
+            setSelectedRoomId("");
+            setOpen(false)
+            onRefresh()
+          } else {
+            setOpen(false)
+            ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
+          }
+          
+        } catch(error){
+          console.error("Error: ", error)
+        } finally {
+        //  setLoading(false)
+        }
+    }
     
 
   const [refreshing, setRefreshing] = useState(false);
@@ -158,7 +133,7 @@ export default function MessagesScreen(){
       };
     
       const RoomList = ({ room })=> (
-        <TouchableOpacity onPress={()=> navigation.navigate("Chat", { roomId: room._id, currentUserId: userId, id: room.users[0]._id })} style={tw`flex flex-row w-full h-22 justify-between align-center border-white`}>
+        <TouchableOpacity delayLongPress={500} onLongPress={()=> { setOpen(true); setSelectedRoomId(room._id); setReceiver(room.users[0]._id); }} onPress={()=> navigation.navigate("Chat", { roomId: room._id, currentUserId: userId, id: room.users[0]._id, userProfilePhoto: room.users[0].photo, userUsername: room.users[0].username  })} style={tw`flex flex-row w-full h-22 justify-between align-center border-white`}>
 
           <View style={tw`flex flex-row justify-center align-center h-20`}>
           <View style={tw`flex flex-col align-center justify-center ml-4`}>
@@ -166,7 +141,7 @@ export default function MessagesScreen(){
           </View>
             <View style={tw`flex flex-col align-center justify-center ml-4 `}>
               <Text style={tw`text-white text-lg font-semibold`}>{room.users[0].username}</Text>
-              <Text style={tw`text-gray-300`}>{room.message}<Text style={tw``}></Text> {formatDistanceToNowStrict(new Date(room.timestamp))}</Text>
+              <Text style={tw`text-gray-300`}>{truncateText(room.message, maxLength)}<Text style={tw``}></Text> {formatDistanceToNowStrict(new Date(room.latestMessageTimestamp))}</Text>
             </View>
           </View>
 
@@ -178,6 +153,8 @@ export default function MessagesScreen(){
 
   return (
     <SafeAreaView style={styles.mainTheme}>
+      
+      <Modal open={open} close={()=> setOpen(false)} message={" Do you want to delete the chat ?"} proceed={deleteChat} optionOne={"delete"} />
 
       <View style={tw`flex flex-row justify-between w-full m-2`}>
         <TouchableOpacity style={tw``}>

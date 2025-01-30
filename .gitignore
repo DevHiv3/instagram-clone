@@ -6,6 +6,10 @@
 # Ignore .env files
 **/.env
 
+**/service-account.json
+**/yarn.lock
+**/google-services.json
+
 # Ignore node_modules directories
 node_modules/
 

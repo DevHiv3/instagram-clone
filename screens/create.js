@@ -1,4 +1,4 @@
-import { View, Text, Alert, StyleSheet, FlatList, Button,Dimensions, Image, TouchableOpacity, ToastAndroid, ActivityIndicator } from 'react-native'
+import { View, Text, Alert, StyleSheet, FlatList, Button, Dimensions, Image, TouchableOpacity, ToastAndroid, ActivityIndicator } from 'react-native'
 import { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store';
@@ -26,7 +26,7 @@ export default function CreateScreen(){
         
               if (storedToken) {
                 setToken(storedToken)
-                console.log(storedToken)
+                
               } else {
                 navigation.replace("Signup")
               }
@@ -122,7 +122,6 @@ export default function CreateScreen(){
     
   return (
         <View style={styles.container}>
-          {selectedMedia ? <View style={tw`flex flex-row justify-center align-center w-full h-80`}><Image style={tw`w-full h-80`} source={{ uri: selectedMedia }} /></View> : <View style={tw`flex flex-row justify-center align-center w-full h-80`}><Image style={tw`w-full h-80`} source={{ uri: images[0] }} /></View>}
           {loading ? <Text style={tw`text-white text-center font-bold`}>Loading....</Text> : <FlatList data={images} keyExtractor={(item, index) => index.toString()} renderItem={renderItem} numColumns={3} contentContainerStyle={styles.grid} />}
         </View>
   )

@@ -154,7 +154,7 @@ export default function CreateStory(){
             const storedToken = await SecureStore.getItemAsync('token');
             if (storedToken) {
                 setToken(storedToken)
-                console.log(storedToken)
+               
             } else {
                 navigation.replace("Signup")
             }
@@ -205,12 +205,36 @@ export default function CreateStory(){
         {!loading ? <Button title={"Pick an Image"} style={tw`m-2`} onPress={pickImage} /> : <Text style={tw`text-white text-center font-bold`}>Loading....</Text>} 
 
         <ScrollView style={styles.container}>
-        {loading ?
-         <Text style={tw`text-white text-center font-bold`}>Loading....</Text> : 
-         <FlatList data={images} keyExtractor={(item, index) => index.toString()} renderItem={renderItem} numColumns={3} contentContainerStyle={styles.grid} />}
-         </ScrollView>
+        <TouchableOpacity style={tw`flex flex-col justify-center mt-4 mb-4`}>
+            <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                <View style={tw`flex flex-row`}>
+                    <Feather name="user-plus" size={24} color="white" />
+                    <Text style={tw`text-white text-md ml-2`}>Tag Friends</Text>
+                </View>
+                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+            </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={tw`flex flex-col justify-center mt-4 mb-4`}>
+            <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                <View style={tw`flex flex-row`}>
+                <Feather name="music" size={24} color="white" />
+                    <Text style={tw`text-white text-md ml-2`}>add music</Text>
+                </View>
+                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+            </View>
+        </TouchableOpacity>
+        <TouchableOpacity style={tw`flex flex-col justify-center mt-4 mb-4`}>
+            <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                <View style={tw`flex flex-row`}>
+                <Entypo name="location-pin" size={24} color="white" />
+                    <Text style={tw`text-white text-md ml-2`}>add location</Text>
+                </View>
+                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+            </View>
+        </TouchableOpacity>
+        </ScrollView>
 
-        <View style={tw`flex flex-row w-full h-14 justify-center align-center mt-4`}>
+        <View style={tw`flex flex-row w-full h-14 justify-center align-center mb-6`}>
             <TouchableOpacity onPress={createStory} style={tw`flex justify-center bg-blue-600 w-4/5 h-14 rounded-xl`}>
               <Text style={tw`text-white uppercase text-center font-bold`}>add to story</Text>
             </TouchableOpacity>

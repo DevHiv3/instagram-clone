@@ -1,22 +1,25 @@
 import express from "express"
 import morgan from "morgan"
 import cors from "cors"
-import fetch from "node-fetch"
 import 'dotenv/config'
 import path from "path"
 import { Server } from 'socket.io';
 import session from 'express-session';
+import { fileURLToPath } from "url";
 import UserRoutes from "./routes/user.js"
 import PostRouter from "./routes/posts.js"
 import StoryRoutes from "./routes/story.js"
 import MessageRoutes from "./routes/message.js"
 import RoomsRoutes from "./routes/room.js"
+import BookMarkRoutes from "./routes/bookmark.js"
+import NotificationRoutes from "./routes/notification.js"
 import passport from "./config/passport.js"
 import corsOptions, { corsConfig } from "./config/cors.js"
 import connectDB from "./config/connect-db.js"
 import ChatSocket from "./sockets/chat.js"
 
-const __dirname = import.meta.dirname;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const app = express()
 
 // Middlewares
@@ -33,6 +36,8 @@ app.use(PostRouter)
 app.use(StoryRoutes)
 app.use(MessageRoutes)
 app.use(RoomsRoutes)
+app.use(BookMarkRoutes)
+app.use(NotificationRoutes)
 
 //static files
 app.use(express.static('./views'))

@@ -1,13 +1,16 @@
-import React, { useState, useEffect,useRef, useLayoutEffect } from "react"
-import { StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity, Dimensions, TouchableWithoutFeedback,Keyboard, Platform, KeyboardAvoidingView, ActivityIndicator, Image, TextInput, FlatList,  RefreshControl } from 'react-native';
+import React, { useState, useEffect,useRef } from "react"
+import { StyleSheet, Text, View, SafeAreaView, ScrollView, Platform, TouchableOpacity, Dimensions, TouchableWithoutFeedback,Keyboard, KeyboardAvoidingView, ActivityIndicator, Image, TextInput, FlatList,  RefreshControl, ToastAndroid } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
+import * as Device from "expo-device";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as SecureStore from 'expo-secure-store';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import BottomNavigation from "../components/bottom-navigation";
+import { FontAwesome } from "@expo/vector-icons";
+import Octicons from '@expo/vector-icons/Octicons';
 import { useSelector } from "react-redux";
 import Post from "../components/post";
+import * as Notifications from 'expo-notifications';
 import { base_url as url } from "../slices/authSlice";
 
 import tw from "twrnc"
@@ -26,8 +29,14 @@ export default function HomeScreen() {
   
    const [refreshing, setRefreshing] = useState(false);
    const [ posts, setPosts ] = useState([]);
+   const [ token, setToken ] = useState("")
    const [ stories, setStories ] = useState([]);
    const [ userId, setUserId ] = useState("")
+   const [notification, setNotification] = useState(false);
+   const [ pushToken, setPushToken ] = useState("")
+   const notificationListener = useRef();
+   const responseListener = useRef();
+   const [ user, setUser ] = useState({})
 
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
@@ -45,12 +54,98 @@ export default function HomeScreen() {
     return url;
   }
 
+  const fetchProfile = async()=>{
+        const uid = await SecureStore.getItemAsync("id")
+        const storedToken = await SecureStore.getItemAsync("token")
+        try{
+          const link = `${base_url}/user/${uid}`
+          const response = await fetch(link, {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${storedToken}`
+            },
+          })
+    
+          const result = await response.json()
+          setUser(result)
+        } catch(error){
+          console.error("Error: ", error)
+        } finally {
+            //  setLoading(false)
+        }
+      }
+
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+    }),
+  })
+
+  const registerForPushNotificationsAsync = async () => {
+    
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        Alert.alert('Failed to get push token for push notification!');
+        return;
+      }
+  
+      const deviceToken = (await Notifications.getExpoPushTokenAsync()).data;
+           // console.log('Device Push Token:', deviceToken);
+      setPushToken(deviceToken)
+      await SecureStore.setItemAsync("push-token", deviceToken)
+      } else {
+        Alert.alert('Must use physical device for Push Notifications');
+      }
+  
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+    };
+
   const onRefresh = ()=>{
     fetchPosts()
     fetchStories()
   };
 
-  const [ token, setToken ] = useState("")
+
+useEffect(() => {
+  
+  registerForPushNotificationsAsync()
+    
+  // Listener for incoming notifications
+  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    setNotification(notification);
+  });
+    
+  // Listener for user interaction with the notification
+  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //  console.log('User interacted with the notification:', response);
+  const route = response.notification.request.content.data.route; // Route from the notification payload
+  if (route) {
+      navigation.navigate(route); // Navigate to the specified route
+  }
+  });
+    
+  return () => {
+    Notifications.removeNotificationSubscription(notificationListener.current);
+    Notifications.removeNotificationSubscription(responseListener.current);
+  };
+}, []);
 
   const reload = async()=>{
     try{
@@ -79,9 +174,10 @@ export default function HomeScreen() {
 
       const result = await response.json()
       setPosts(result.posts)
-      console.log(result.posts)
-
+  
     } catch(error){
+      ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+      ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
       console.error("Error: ", error)
     } 
   }
@@ -93,7 +189,6 @@ export default function HomeScreen() {
       if (storedToken) {
         setToken(storedToken)
         setUserId(uid)
-        console.log(storedToken)
         
         const link = `${base_url}/verify`
         const response = await fetch(link, {
@@ -121,6 +216,7 @@ export default function HomeScreen() {
         
         fetchPosts()
         fetchStories()
+        fetchProfile()
       
       } else {
         navigation.replace("Signup")
@@ -145,14 +241,13 @@ export default function HomeScreen() {
         })
   
         const result = await response.json()
-        console.log(result.stories)
         setStories(result.stories)
          
       } catch(error){
+        ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+        ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
         console.error(error)
-      } finally {
-  
-      }
+      } 
     }
 
     const renderItem = ({ item })=>(
@@ -168,26 +263,24 @@ export default function HomeScreen() {
 
   
     return (
-        <BottomNavigation>
         <View style={{ ...styles.container }}>
            
-      <ScrollView refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      
         {/* Stories View */}
         <View style={{ ...styles.storiesView }}>
           <View style={styles.storiesViewTitleView}>
             <Image style={tw`w-36 h-10 text-white`} source={{ uri: "https://www.logo.wine/a/logo/Instagram/Instagram-Wordmark-White-Dark-Background-Logo.wine.svg" }} />
             <View style={tw`flex flex-row w-30 justify-evenly`}>
-            <TouchableOpacity onPress={()=> navigation.navigate("Messages")} style={{ ...styles.showAllText }}><AntDesign name="hearto" size={28} color="white" /></TouchableOpacity>
+            <TouchableOpacity onPress={()=> navigation.navigate("Notification")} style={{ ...styles.showAllText }}><AntDesign name="hearto" size={28} color="white" /></TouchableOpacity>
             <TouchableOpacity onPress={()=> navigation.navigate("Messages")} style={{ ...styles.showAllText }}><FontAwesome5 name="facebook-messenger" size={24} color="white" /></TouchableOpacity>
           </View>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          
             <View style={{ flexDirection: 'row', marginTop: 10, marginLeft: 10 }}>
              <FlatList data={stories} horizontal={true} keyExtractor={(item, index)=> index.toString()} renderItem={renderItem} />
             </View>
-          </ScrollView>
+         
         </View>
 
         {/* Posts View */}
@@ -195,14 +288,21 @@ export default function HomeScreen() {
           {!posts ? <View style={tw`h-3/5 w-full flex-1`}><Text style={tw`text-white text-lg font-bold text-center`}>Start following someone </Text></View> :
           <View>
           {posts.map((post, index) => (
-            <Post key={index} content={post} token={token} reload={fetchPosts} userId={userId} />
+            <Post key={index} content={post} token={token} userId={userId} />
           ))}
           </View>}
         </View> 
         <View style={{ height: 20 }}></View>
       </ScrollView>
+      <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>
+      <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Create")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Notification")}><AntDesign name="hearto" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=>{ navigation.navigate("Profile", { id: userId })}}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: user.photo }} /></TouchableOpacity>
     </View>
-    </BottomNavigation>
+    </View>
+    
     );
   }
 
@@ -214,6 +314,7 @@ export default function HomeScreen() {
     width: width,
     paddingTop: 40,
   },
+
   searchBarView: {
     height: 50,
     alignItems: 'center',

@@ -8,6 +8,7 @@ const StorySchema = mongoose.Schema({
     finish: { type: Number, required: true },
     mentions: [{ type: ObjectId, ref: 'User'}],
     timestamp: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now, expires: 120 }
 })
 
 

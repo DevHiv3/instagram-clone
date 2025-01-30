@@ -43,21 +43,9 @@ export default function FinalizePostScreen(){
         })
       },[])
 
-      const [refreshing, setRefreshing] = useState(false)
       const [open, setOpen] = useState(false);
       const [ loading, setLoading ] = useState(0)
       const [ uid, setUid ] = useState('')
-
-      const onRefresh = ()=>{
-        setRefreshing(true);
-        fetch('https://randomuser.me/api/?results=5')
-        .then(res => {
-           return res.json()
-        })
-        .then((res) => {
-          setRefreshing(false);
-        })
-      };
 
       useEffect(()=>{
         async function getUserID() {
@@ -75,7 +63,7 @@ export default function FinalizePostScreen(){
               if (storedToken) {
                 setToken(storedToken)
                 setUserId(id)
-                console.log(storedToken)
+               
               } else {
                 navigation.replace("Signup")
               }

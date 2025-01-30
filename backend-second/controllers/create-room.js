@@ -14,6 +14,7 @@ export default async function CreateRoom(req,res){
             users: [userId, req.user.id],
             message: "start a conversation",
             messageTimestamp: new Date().toISOString(),
+            latestMessageTimestamp: new Date().toISOString(),
             timestamp: new Date().toISOString(),
         })
 

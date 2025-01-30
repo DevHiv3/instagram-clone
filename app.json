@@ -1,26 +1,38 @@
 {
   "expo": {
-    "name": "tinder-clone",
+    "name": "instagram-clone",
     "slug": "tinder-clone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/splash-screen-logo.webp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/splash-screen-logo.webp",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2f2f2f"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "com.tinder_clone.app",
+      "package": "com.instagramclone.app",
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/splash-screen-logo.webp",
+        "backgroundColor": "#2f2f2f"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,7 +42,7 @@
         "projectId": "87c9a1f0-9723-411c-80f4-9eeffde71f12"
       }
     },
-    "scheme": "tinder_clone",
+    "scheme": "instagramclone",
     "owner": "dev.hiv3",
     "plugins": [
       "expo-secure-store",
@@ -48,6 +60,12 @@
           "isAccessMediaLocationEnabled": true
         }
       ]
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/87c9a1f0-9723-411c-80f4-9eeffde71f12"
+    }
   }
 }

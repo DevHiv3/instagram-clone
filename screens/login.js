@@ -12,12 +12,19 @@ import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStore from 'expo-secure-store';
 import VerifyOTPModal from "../components/verify-otp"
+import ChangePasswordModal from "../components/change-password";
+import EmailInputModal from "../components/email-input";
 
 const { width, height } = Dimensions.get("window")
 
 export default function SignupScreen(){
 
    const [ open, setOpen ] = useState(false)
+   const [ verifyPassBoolean, setVerifyPassBoolean ] = useState(false)
+   const [ token, setToken ] = useState("")
+   const [ uid, setUid ] = useState("")
+   const [ EmailInputBoolean, setEmailInputBoolean ] = useState(false)
+   const [ forgotPassBoolean, setForgotPassBoolean ] = useState(false)
    const [ progressBoolean, setProgressBoolean ] = useState(false)
   
       useEffect(() => {
@@ -77,9 +84,15 @@ export default function SignupScreen(){
 
     if(result.message === "success"){
       console.log(result.token,result.id)
-      await SecureStore.setItemAsync("token", result.token)
-      await SecureStore.setItemAsync("id", result.id)
+      setToken(result.token)
+      setUid(result.id)
       verification()
+    } else if(result.message === "Invalid Credentials"){
+      setProgressBoolean(false)
+      ToastAndroid.show("Invalid credentials", ToastAndroid.SHORT)
+    } else {
+      setProgressBoolean(false)
+      ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
     }
   }
 
@@ -94,11 +107,30 @@ export default function SignupScreen(){
     })
 
     const result = await response.json()
-    console.log(result)
     if(result.message === "success"){
+      await SecureStore.setItemAsync("token", token)
+      await SecureStore.setItemAsync("id", uid)
       setProgressBoolean(false)
       setOpen(true)
+    } else if(result.message === "Invalid Credentials"){
+      setProgressBoolean(false)
+      ToastAndroid.show("Invalid credentials", ToastAndroid.SHORT)
+    } else {
+      setProgressBoolean(false)
+      ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
     }
+  }
+
+  const otpVerified = async()=>{
+    setOpen(false);
+    setProgressBoolean(false);
+    navigation.replace("Home")
+  }
+
+  const changePass = async()=>{
+    setVerifyPassBoolean(false);
+    setProgressBoolean(false);
+    setForgotPassBoolean(true);
   }
 
 
@@ -112,8 +144,12 @@ export default function SignupScreen(){
         colors={['#222', '#222', '#111']}
         style={styles.container}
       >
-        <PostProgressBar open={progressBoolean} close={()=> setProgressBoolean(false)} message={" logging in..."} progress={100} />
-         <VerifyOTPModal open={open} close={()=> setOpen(false)}  message={"Enter OTP"} email={email} proceed={()=> { setOpen(false); navigation.replace("Home") }} />
+        <PostProgressBar open={progressBoolean} close={()=> setProgressBoolean(false)} message={" please wait..."} progress={100} />
+         <VerifyOTPModal open={open} close={()=> setOpen(false)}  message={"Enter OTP"} email={email} proceed={otpVerified} showLoading={()=> setProgressBoolean(true)} removeLoading={()=> setProgressBoolean(false)} />
+         <VerifyOTPModal open={verifyPassBoolean} close={()=> setVerifyPassBoolean(false)}  message={"Enter OTP"} showLoading={()=> setProgressBoolean(true)} email={email} proceed={changePass} />
+         <EmailInputModal open={EmailInputBoolean} close={()=> setEmailInputBoolean(false)}  message={"Enter your email"} showLoading={()=> setProgressBoolean(true)} proceed={(mail)=> { setEmailInputBoolean(false); setEmail(mail); setProgressBoolean(false);  setVerifyPassBoolean(true); }} />
+         <ChangePasswordModal open={forgotPassBoolean} close={()=> setForgotPassBoolean(false)} message={"Enter your password"} email={email} showLoading={()=> setProgressBoolean(true)}  proceed={()=> { setForgotPassBoolean(false); setProgressBoolean(false); navigation.replace("Home") }} />
+
          <Text style={styles.welcomeText}>Welcome!</Text>
 
         <Text style={styles.loginText}>Login</Text>
@@ -166,6 +202,15 @@ export default function SignupScreen(){
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.signUpTextView}>
+          <Text style={styles.signUpText}></Text>
+          <TouchableOpacity onPress={()=> setEmailInputBoolean(true)}>
+            <Text style={[styles.signUpText, { color: '#B53471' }]}>
+              {' Forgot password ?'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
       </LinearGradient>
     </TouchableWithoutFeedback>
   );

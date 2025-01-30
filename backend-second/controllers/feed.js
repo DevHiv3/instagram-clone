@@ -10,7 +10,6 @@ export default async function Feed(req,res){
         }
     
         const posts = await Post.find({ admin:{ $in: user.followings } }).populate("comments.postedBy", "username photo _id").populate("admin", "username photo _id");
-       // console.log("Feed Posts: ", posts, user)
         return res.status(200).json({ message: "success", posts: posts })
 
     } catch(error){

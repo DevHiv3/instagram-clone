@@ -48,7 +48,7 @@ export default async function Verification(req,res){
         return res.status(200).json({ message: "success", otp: otp })
 
     } catch(error){
-        console.log("Internal Server Error: ", error.response.body.errors)
+        console.log("Internal Server Error: ", error)
         return res.status(500).json({ message: "Internal Server Error"})
     }
 }

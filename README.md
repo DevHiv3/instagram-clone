@@ -6,7 +6,7 @@ A full fledged instagram clone built entirely on JavaScript Tech Stack
 
 ## Demo
 
-Insert gif or link to demo
+Check out the app! [link](https://instagram-clone-expo.vercel.app)
 
 
 ## Screenshots
@@ -16,17 +16,19 @@ Insert gif or link to demo
 
 ## Features
 
-- Signup / Login User 
+- Signup / Login User 🗝️
 - OTP authentication 🔒
 - Forgot Password
 - Follow / Unfollow user 👤
 - Edit User Profile ✏️
-- Edit Post 
+- Edit Post ✒️
+- Tag users in post 👥
 - Like 🩷 / Comment 💬/ Share posts 
 - Search User 🔍
 - Realtime Messaging Platform ⚡
-- Add Stories
-
+- Last Online 👤
+- Notifications 📳
+- Add Stories 📷
 
 
 ## Tech Stack

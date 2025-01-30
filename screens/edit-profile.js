@@ -122,6 +122,7 @@ export default function EditProfileScreen(){
       }
       } catch(error){
         ToastAndroid.show("Error uploading profile!", ToastAndroid.SHORT)
+        ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
         console.error("Error uploading profile!", error)
       }
     }
@@ -133,7 +134,7 @@ export default function EditProfileScreen(){
         
               if (storedToken) {
                 setToken(storedToken)
-                console.log(storedToken)
+            
               } else {
                 navigation.replace("Signup")
               }
@@ -156,28 +157,10 @@ export default function EditProfileScreen(){
             <View style={tw`flex flex-row justify-center items-center bg-neutral-800 `}>
                 <TouchableOpacity style={tw`mr-2`}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: user.photo }} /></TouchableOpacity>
                 <TextInput style={tw` w-4/5 h-14 bg-neutral-800 text-white`} placeholderTextColor="#AAA" placeholder="your bio" value={bio} onChangeText={(text)=> setBio(text)} />
-            </View>
-            <TouchableOpacity style={tw`flex flex-col justify-center mt-4 mb-4`}>
-            <View style={tw`flex flex-row justify-between items-center ml-4`}>
-                <View style={tw`flex flex-row`}>
-                    <Feather name="user-plus" size={24} color="white" />
-                    <Text style={tw`text-white text-md ml-2`}>Tag Friends</Text>
-                </View>
-                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
-            </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={tw`flex flex-col justify-center mt-4 mb-4`}>
-            <View style={tw`flex flex-row justify-between items-center ml-4`}>
-                <View style={tw`flex flex-row`}>
-                <Feather name="music" size={24} color="white" />
-                    <Text style={tw`text-white text-md ml-2`}>add music</Text>
-                </View>
-                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
-            </View>
-        </TouchableOpacity>
+            </View> 
        
 
-        <View style={tw`flex flex-row w-full h-14 justify-center align-center mt-4`}>
+        <View style={tw`flex flex-row w-full h-14 justify-center align-center mt-10`}>
             <TouchableOpacity onPress={editProfile} style={tw`flex justify-center bg-blue-600 w-4/5 h-14 rounded-xl`}>
               <Text style={tw`text-white uppercase text-center font-bold`}>update</Text>
             </TouchableOpacity>

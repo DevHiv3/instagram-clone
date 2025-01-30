@@ -5,6 +5,7 @@ const RoomSchema = mongoose.Schema({
     message: { type: String, required: true },
     messageTimestamp: { type: String, required: true },
     timestamp: { type: String, required: true },
+    latestMessageTimestamp: { type: String, required: true },
     users: [{ type: ObjectId, ref: 'User' }]
 })
 

@@ -11,7 +11,6 @@ export default async function FeedStories(req,res){
         const stories = await Story.find({ user: { $in: user.followings } }).distinct("user");
         const response = await User.find({ _id: { $in: stories } },"_id username photo")
 
-
         return res.status(200).json({ message: "success", stories: response })
 
     } catch(error){

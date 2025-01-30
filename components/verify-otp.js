@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react'
 import RNModal from 'react-native-modal';
 import { useSelector } from 'react-redux';
 import { base_url as url } from "../slices/authSlice";
+import Entypo from '@expo/vector-icons/Entypo';
 
 import tw from 'twrnc'
 const { width, height } = Dimensions.get("window")
 
-function VerifyOTPModal({ open, close, message, proceed, email }){
+function VerifyOTPModal({ open, close, message, proceed, showLoading, removeLoading, email }){
 
     useEffect(()=>{
         
@@ -17,6 +18,7 @@ function VerifyOTPModal({ open, close, message, proceed, email }){
     const base_url = useSelector(url)
 
     const verifyOTP = async()=>{
+          showLoading()
           const response = await fetch(`${base_url}/verify-otp`, {
             method: "POST",
             body: JSON.stringify({ otp: code, email: email }),
@@ -28,13 +30,23 @@ function VerifyOTPModal({ open, close, message, proceed, email }){
           const result = await response.json()
 
           if(result.message === "success"){
-            await ToastAndroid.show("OTP verified!", ToastAndroid.SHORT)
+            setCode("")
+            console.log(result)
+            ToastAndroid.show("OTP verified!", ToastAndroid.SHORT)
             proceed()
           } 
           
-          if(result.message=== "user not found"){
+          if(result.message === "user not found"){
+            setCode("")
             console.log(result.message)
-            await ToastAndroid.show("User Not Found",ToastAndroid.SHORT)
+            ToastAndroid.show("User Not Found",ToastAndroid.SHORT)
+            removeLoading()
+            close()
+          } else if(result.message == "Invalid Credentials"){
+            setCode("")
+            console.log(result.message)
+            ToastAndroid.show("Invalid OTP, try again!",ToastAndroid.SHORT)
+            removeLoading()
             close()
           }
         }
@@ -45,10 +57,14 @@ function VerifyOTPModal({ open, close, message, proceed, email }){
             <View>
               <RNModal isVisible={open} animationIn="zoomIn" animationOut="zoomOut">
                 <View style={styles.forgotpassModal}>
+                <View style={tw`flex flex-row justify-between`}>
                   <Text style={tw`text-white text-lg font-bold ml-2`}>
                     {message}
                   </Text>
-                  
+                  <TouchableOpacity style={tw`ml-2`} onPress={()=>{ setEmail(""); close()}}>
+                    <Entypo name="cross" size={24} color="white" />
+                  </TouchableOpacity>
+                  </View>
                   <View style={tw`mt-2`}>
                     <View style={tw`flex flex-row justify-center items-center bg-neutral-800 `}>
                         <TextInput style={tw` w-4/5 h-14 bg-neutral-800 text-white`} placeholderTextColor="#AAA" placeholder="Enter OTP" value={code} onChangeText={(text)=> setCode(text)} />

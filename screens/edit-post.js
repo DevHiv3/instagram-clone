@@ -122,7 +122,7 @@ export default function EditPostScreen(){
       }
       } catch(error){
         ToastAndroid.show("Error updating post!", ToastAndroid.SHORT)
-        ToastAndroid.show("Must select an image!", ToastAndroid.SHORT)
+        ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
         console.error("Error uploading post!", error)
       }
     }
@@ -134,7 +134,7 @@ export default function EditPostScreen(){
         
               if (storedToken) {
                 setToken(storedToken)
-                console.log(storedToken)
+               
               } else {
                 navigation.replace("Signup")
               }

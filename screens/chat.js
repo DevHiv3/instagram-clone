@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import * as ImagePicker from 'expo-image-picker';
 import Modal from '../components/modal';
-import * as FileSystem from 'expo-file-system';
 import { useFonts, Inter_900Black, Inter_100Thin,
     Inter_200ExtraLight,
     Inter_300Light,
@@ -28,7 +27,7 @@ export default function ChatScreen(){
     const base_url = useSelector(url)
     const MessagesRef = useRef(null);
 
-    const { id, roomId, currentUserId } = route.params
+    const { id, roomId, currentUserId, userProfilePhoto, userUsername } = route.params
     const socket = io(base_url);
     const messageInputRef = useRef(null)
 
@@ -38,12 +37,12 @@ export default function ChatScreen(){
     const [ currentUser, setCurrentUser ] = useState({})
     const [ user, setUser ] = useState({})
     const [ userPhoto, setUserPhoto ] = useState("")
-    const [ username, setUsername ] = useState("")
-    const [ message, setMessage ] = useState("")
+    const [ username, setUsername ] = useState("loading...")
+    const [ message, setMessage ] = useState("") 
     const [ messageId, setMessageId ] = useState("")
     const [ messages, setMessages ] = useState([])
     const [ fileType, setFileType ] = useState("")
-    const [open, setOpen] = useState(false);
+    const  [open, setOpen] = useState(false);
     const [ gifVisibility, setGifVisibility ] = useState(false)
     const [ hasPickedImage, setHasPickedImage ] = useState(false)
 
@@ -129,7 +128,7 @@ export default function ChatScreen(){
         
         const result = await response.json()
         setMessages(result.messages)
-      
+    
       } catch(error){
         console.error("Error: ", error)
       } finally {
@@ -153,8 +152,7 @@ export default function ChatScreen(){
         setUser(result)
         setUsername(result.username)
         setUserPhoto(result.photo)
-        console.log("Ther other user photo is", result.photo)
-      
+        console.log("The result and username: ", result.username)
       } catch(error){
         console.error("Error: ", error)
       } finally {
@@ -166,10 +164,10 @@ export default function ChatScreen(){
     useEffect(()=>{
 
       getMessages()
+      fetchUserProfile()
 
       socket.on("receive-messages", (msgs) => {
         setMessage("")
-        fetchUserProfile()
         setMessages(msgs);
       });
 
@@ -196,13 +194,13 @@ export default function ChatScreen(){
   useLayoutEffect(()=>{
     navigation.setOptions({
       headerTitle: ()=>(
-      <TouchableOpacity style={tw`flex flex-row justify-center align-center`}>
+      <TouchableOpacity onPress={()=> navigation.navigate("Profile", { id: id })} style={tw`flex flex-row justify-center align-center`}>
         <View style={tw`flex flex-col align-center justify-center`}>
-          <Image style={tw`h-10 w-10 rounded-full border-4 border-gray-700`} source={{ uri: userPhoto }} />
+          <Image style={tw`h-10 w-10 rounded-full border-4 border-gray-700`} source={{ uri: userProfilePhoto }} />
         </View>
         
         <View style={tw`flex flex-col align-center justify-center ml-2`}>
-          <Text style={tw`text-white font-bold text-xl`}>{username}</Text>
+          <Text style={tw`text-white font-bold text-xl`}>{userUsername}</Text>
         </View>
         </TouchableOpacity>
         ),
@@ -237,7 +235,6 @@ export default function ChatScreen(){
       const userId = await SecureStore.getItemAsync('id');
       if (storedToken) {
         setToken(storedToken)
-        console.log(storedToken)
         fetchProfile()
         fetchUserProfile()
         getMessages()
@@ -275,15 +272,15 @@ export default function ChatScreen(){
         {!(message.sender._id === currentUserId) == true ? 
         /* LEFT HAND TEXT */
         <View style={tw`flex-row justify-start mb-2`}>
-          <TouchableOpacity style={tw`flex  p-6 rounded-3xl bg-neutral-800 w-40 m-2 self-start`}>
-          {message.type == "text" ? <Text style={tw`text-white font-semibold`}>{message.message} </Text>: <Image style={tw`rounded-2xl h-28 w-28 m-2`} source={{ uri: message.message }} />}
+          <TouchableOpacity onPress={()=>{ if(message.type !== "text"){ navigation.navigate("Photo", { photo: message.message })}}} style={tw`flex ${message.type == "text" ? "p-6": "" } rounded-3xl bg-neutral-800 w-40 self-start`}>
+          {message.type == "text" ? <Text selectable={true} style={tw`text-white font-semibold`}>{message.message} </Text>: <Image style={tw`rounded-2xl h-40 w-full`} source={{ uri: message.message }} />}
           </TouchableOpacity>
         </View>
       :
        /* RIGHT HAND TEXT */
       <View style={tw`flex-row justify-end mb-2`}>
-        <TouchableOpacity onLongPress={()=>{ setOpen(true); setMessageId(message._id)}} delayLongPress={500} style={tw`p-6 rounded-3xl bg-fuchsia-800 w-40 m-2 self-end`}>
-          {message.type == "text" ? <Text style={tw`text-white font-semibold`}>{message.message} </Text>: <Image style={tw`rounded-2xl h-42 w-42 m-2`} source={{ uri: message.message }} />}
+        <TouchableOpacity onPress={()=>{ if(message.type !== "text"){ navigation.navigate("Photo", { photo: message.message })}}} onLongPress={()=>{ setOpen(true); setMessageId(message._id)}} delayLongPress={500} style={tw`${message.type == "text" ? "p-6": "" } rounded-3xl bg-fuchsia-800 w-40 m-2 self-end`}>
+          {message.type == "text" ? <Text selectable={false} style={tw`text-white font-semibold`}>{message.message} </Text>: <Image style={tw`rounded-2xl h-40 w-full`} source={{ uri: message.message }} />}
         </TouchableOpacity>
       </View>
       }
@@ -324,12 +321,6 @@ const styles = StyleSheet.create({
    flex: 1,
    backgroundColor: "#000",
    paddingBottom: 60,
-  },
-
-  screen: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
 
   bottomBar: {

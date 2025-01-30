@@ -29,6 +29,8 @@ export default function SignupScreen(){
 
   const [user, setUser] = useState(null);
   const [ username, setUsername ] = useState("")
+  const [usernameMessage, setUsernameMessage] = useState(""); 
+  const [ emailMessage, setEmailMessage] = useState(""); 
 	const [ email, setEmail ] = useState("")
   const [ password, setPassword ] = useState("")
   const [ image, setImage ] = useState(null)
@@ -81,6 +83,12 @@ export default function SignupScreen(){
         await SecureStore.setItemAsync("token", result.token)
         await SecureStore.setItemAsync("id", result.id)
         verification()
+      } else if(result.message === "Invalid Credentials"){
+        setProgressBoolean(false)
+        ToastAndroid.show("Invalid credentials", ToastAndroid.SHORT)
+      } else {
+        setProgressBoolean(false)
+        ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
       }
     }
 
@@ -101,6 +109,9 @@ export default function SignupScreen(){
       if(result.message === "success"){
         setProgressBoolean(false)
         setOpen(true)
+      } else {
+        setProgressBoolean(false)
+        ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
       }
     }
 
@@ -138,8 +149,55 @@ export default function SignupScreen(){
 
     if(result === "success"){
       login()
+    } else if(result.message === "Invalid Credentials"){
+      setProgressBoolean(false)
+      ToastAndroid.show("Invalid credentials", ToastAndroid.SHORT)
+      setProgressBoolean(false)
+    } else if(result.message === "User already exists"){
+      setProgressBoolean(false)
+      ToastAndroid.show("User already exists!", ToastAndroid.SHORT)
+    } else if(result.message === "No file uploaded"){
+      setProgressBoolean(false)
+      ToastAndroid.show("No file uploaded", ToastAndroid.SHORT)
+    } else {
+      setProgressBoolean(false)
+      ToastAndroid.show("Internal server error, try again later!", ToastAndroid.SHORT)
     }
   }
+  }
+
+  const searchUsername = async()=>{
+    const link = `${base_url}/find-username?username=${username}`
+    const response = await fetch(link, {
+      method: "GET",
+      headers: {
+        'Content-Type': "application/json"
+      }
+    })
+    const result = await response.json()
+    if(result.data){
+      console.log(result.data)
+      setUsernameMessage("Username already taken!");
+    } else {
+      setUsernameMessage(""); 
+    }
+  }
+
+  const searchEmail = async()=>{
+    const link = `${base_url}/find-email?email=${email}`
+    const response = await fetch(link, {
+      method: "GET",
+      headers: {
+        'Content-Type': "application/json"
+      }
+    })
+    const result = await response.json()
+    if(result.data){
+      console.log(result.data)
+      setEmailMessage("Email already used!");
+    } else {
+      setEmailMessage(""); 
+    }
   }
 
   useLayoutEffect(()=>{
@@ -179,22 +237,28 @@ export default function SignupScreen(){
         <TextInput
           placeholder='username'
           value={username}
-          onChangeText={(text) => setUsername(text)}
+          onChangeText={(text) =>{ setUsername(text); searchUsername(); }}
           placeholderTextColor='#808e9b'
           style={styles.input}
         />
+        {usernameMessage ? (
+          <Text style={styles.usernameMessage}>{usernameMessage}</Text> // Conditionally render the message
+        ) : null}
         <TextInput
           placeholder='Email Address'
           placeholderTextColor='#808e9b'
           style={styles.input}
           autoCorrect={true}
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={(text) =>{ setEmail(text); searchEmail(); }}
           autoCapitalize={false}
           autoCompleteType='email'
           keyboardType='email-address'
           textContentType='emailAddress'
         />
+        {emailMessage ? (
+          <Text style={styles.usernameMessage}>{emailMessage}</Text> // Conditionally render the message
+        ) : null}
         <TextInput
           placeholder='Password'
           value={password}
@@ -319,5 +383,9 @@ const styles = StyleSheet.create({
     color: '#808e9b',
     fontSize: 20,
     fontWeight: '500',
+  },
+  usernameMessage: {
+    color: "red",
+    marginTop: 5,
   },
 })

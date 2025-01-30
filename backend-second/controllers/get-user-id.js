@@ -1,5 +1,4 @@
 import User from "../models/user.js"
-import Post from "../models/post.js"
 
 export default async function getUserID(req,res){
     try {
@@ -20,12 +19,9 @@ export default async function getUserID(req,res){
             message: "success"
         }
 
-       // console.log(response)
-        
         res.status(200).json(response);
     } catch(error){
         console.error(req.params.id)
         res.status(500).json({ message: 'Internal server error', error });
-    }
-    
+    }  
 }

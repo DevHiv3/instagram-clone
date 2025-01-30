@@ -21,10 +21,9 @@ export default function StoryScreen(){
   const [ token, setToken ] = useState("")
 
   const fetchStories = async()=>{
-    const userId = await SecureStore.getItemAsync('id');
     const storedToken = await SecureStore.getItemAsync('token');
     try{
-      const link = `${base_url}/story/${userId}`
+      const link = `${base_url}/story/${id}`
       const response = await fetch(link, {
         method: "GET",
         headers: {
@@ -34,7 +33,6 @@ export default function StoryScreen(){
       })
 
       const result = await response.json()
-      console.log(result, id)
       setStories(result.stories)
       if(result.stories.length == 0){
         ToastAndroid.show("No stories found!", ToastAndroid.SHORT)
@@ -56,7 +54,6 @@ export default function StoryScreen(){
       
       if (storedToken) {
         setToken(storedToken)
-        console.log(storedToken)
         fetchStories()
       } else {
         navigation.replace("Signup")

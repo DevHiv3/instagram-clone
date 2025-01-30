@@ -18,7 +18,7 @@ export default async function SendMessage(socket, msg, room, sender, receiver){
 
             await message.save()
 
-            const result = await Room.findByIdAndUpdate(room, { $set: { message: msg } }, { new: true })
+            const result = await Room.findByIdAndUpdate(room, { $set: { message: msg, messageTimestamp: new Date().toISOString(), latestMessageTimestamp: new Date().toISOString() } }, { new: true })
             const newMessages = await Message.find({ $or: [ { sender: sender, receiver: receiver }, { sender: receiver, receiver: sender }, ] }).populate("sender", "username _id photo").populate("receiver", "username _id photo")
             
             socket.to(room).emit("receive-messages", newMessages)

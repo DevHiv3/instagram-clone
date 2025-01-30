@@ -23,13 +23,40 @@ import EditPostScreen from './screens/edit-post';
 import BookmarkScreen from './screens/bookmarks';
 import FinalizePostScreen from './screens/finalize-post';
 import CreateStory from './screens/create-story';
+import PhotoScreen from './screens/photo';
+import AboutScreen from './screens/about';
 
 const Stack = createNativeStackNavigator()
 
 export default function Navigator() {
 
+  const linking = {
+    prefixes: ['instagramclone://'], // Define the custom scheme
+    config: {
+      screens: {
+        Home: 'home',  // Only deep link to the Home screen
+        Notification: 'notification',
+        Signup: 'signup',
+        Login: 'login',
+        Create: 'create',
+        Chat: 'chat',
+        Search: 'search',
+        Profile: 'profile',
+        Post: 'post',
+        Settings: 'settings',
+        Story: 'story',
+        Messages: 'messages',
+        Followers: 'followers',
+        Followings: 'followings',
+        Bookmarks: 'bookmarks',
+        Photo: 'photo'
+        // Profile screen does not have a deep link, it’s ignored here
+      },
+    },
+  };
+
   return (
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <SafeAreaProvider>
           <KeyboardAvoidingView behavior={Platform.OS === "ios"  ? "padding":"height"} style={{ flex: 1}}
           keyboardVerticalOffset={Platform.OS === "android" ? -64 : 0}>
@@ -43,7 +70,7 @@ export default function Navigator() {
                 <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Create" component={CreateScreen} options={{ headerShown: true }} />
-                <Stack.Screen name="Notification" component={NotificationScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Notification" component={NotificationScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="Post" component={PostScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="Story" component={StoryScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: true }} />
@@ -54,7 +81,8 @@ export default function Navigator() {
                 <Stack.Screen name="Bookmarks" component={BookmarkScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="Finalize-Post" component={FinalizePostScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="Create-Story" component={CreateStory} options={{ headerShown: true }} />
-
+                <Stack.Screen name="Photo" component={PhotoScreen} options={{ headerShown: true }} />
+                <Stack.Screen name="About" component={AboutScreen} options={{ headerShown: true }} />
 
           </Stack.Navigator>
         

@@ -8,6 +8,7 @@ const UserSchema = mongoose.Schema({
 	photo: { type: String, required: true },
 	status: { type: Boolean, required: true },
 	otp: { type: Number, unique: true },
+	deviceToken: { type: String, unique: true },
 	timestamp: { type: String, required: true },
 	followings: [{ type: ObjectId, ref: 'User' }],
 	followers: [{ type: ObjectId, ref: 'User' }]

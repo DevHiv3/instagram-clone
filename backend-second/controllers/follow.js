@@ -1,4 +1,5 @@
 import User from "../models/user.js"
+import Notification from "../models/notification.js"
 import 'dotenv/config'
 
 export default async function Follow(req,res){
