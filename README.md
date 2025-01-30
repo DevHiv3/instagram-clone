@@ -1,17 +1,25 @@
-
-# INSTAGRAM CLONE
+#  [INSTAGRAM CLONE](https://expo.dev/artifacts/eas/orQBBAoc9dt2LDkoK81ndF.apk)
 
 A full fledged instagram clone built entirely on JavaScript Tech Stack
 
 
 ## Demo
 
-Check out the app! [link](https://instagram-clone-expo.vercel.app)
+### check out the app [here!](https://expo.dev/artifacts/eas/orQBBAoc9dt2LDkoK81ndF.apk)
 
+## APK Link
 
-## Screenshots
+```bash
+  https://expo.dev/artifacts/eas/orQBBAoc9dt2LDkoK81ndF.apk
+```
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+## Screenshots  
+
+| [Signup](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreib6gj37hsjp33aa6xk5b724ehhmhmvzm3dftbp3tbx4msodrns4xu) | [Login](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreifntesxzwqqylyqjfkrmb4lglxjk72oxxa5e547b6uoxljjuk3qnq) | [Verify OTP](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreiea2qguuepfxnmlzw3imdvnwtzepz4gcsbngfnsoevu2lxq7dqn2q) |
+|----------------------|----------------------|----------------------|
+| [Home](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreia6zhihhudc3oznbbd3ynpwao7l3amyxediye66gch7ijoy6okt3u) | [Profile](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreia42lz2kb6npxpukbewikxjptmfilbiy6m4meqfaid3sg7o43qrhe) | [Settings](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreifhxrz3xt2cw2ycpsbqsndqktkjhmzm2nymhwrwt6yjv2xy4bdh7q) |
+| [Bookmarks](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreicbooiwlqiptbj3dt2fow3l3exqxvxl43rugrdzyq6gu4ljlsr7nq) | [Chat](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreiho3kcd2fijigcdj7n2lskpjteazn726v5rolzoy4rrh5e2cdaefu) | [About this account](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreigpp6tcp7l7e4lfz4f5i2p5tguy7kreq25dhenomyal4vciojaude) |
+| [Create Post](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreic2krthtq7gjcqwdyq5lj5qsrahn7jluofsl3prgjmzxevo573mdu) | [Choose Photo](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreihru5bxgvvdzd7f3yfc7gcjcug4mbqyoqesf2die66fb6kptwjdta) | [Search](https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafkreif4l26shehbzhktbvwevlew2rzfw67pzz5jaskfmf4b3nwmv42zjy) |
 
 
 ## Features
@@ -29,6 +37,10 @@ Check out the app! [link](https://instagram-clone-expo.vercel.app)
 - Last Online 👤
 - Notifications 📳
 - Add Stories 📷
+- Forgot Password 🔐
+- Bookmark posts 🔖
+- Remove follower 👤
+- OTP verification 📲
 
 
 ## Tech Stack
@@ -61,13 +73,33 @@ Install dependencies
   npm i -S --force
 ```
 
+Go to the server directory
+
+```bash
+  cd backend-second
+```
+
+Install server dependencies
+
+```bash
+  npm i -S --force
+```
+
+
     
 ## Run Locally
+
+Start expo
+
+```bash
+  npx expo start -c
+```
 
 
 Start the server
 
 ```bash
+  cd backend-second
   npm start
 ```
 
