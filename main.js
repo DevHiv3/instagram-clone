@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState, useEffect } from "react"
-import { StyleSheet, Text, View,  KeyboardAvoidingView, Button, Platform, ToastAndroid } from 'react-native';
+import { StyleSheet, Text, Alert, View, ActivityIndicator, KeyboardAvoidingView, Button, Platform, ToastAndroid } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -31,13 +31,15 @@ const Stack = createNativeStackNavigator()
 
 export default function Navigator() {
 
-  const [isUpdating, setIsUpdating] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
+    
     async function checkForUpdates() {
       try {
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
+          setIsUpdating(true)
           await Updates.fetchUpdateAsync();
           Alert.alert(
             "Update Available",
@@ -52,7 +54,7 @@ export default function Navigator() {
       }
     }
 
-    checkForUpdates();
+  //  checkForUpdates();
   }, []);
 
   if (isUpdating) {

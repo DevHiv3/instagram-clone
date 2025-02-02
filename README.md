@@ -1,16 +1,16 @@
-#  [INSTAGRAM CLONE](https://expo.dev/artifacts/eas/2ZLYw2ymqF9kLXnwgs6Vug.apk)
+#  [INSTAGRAM CLONE](https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk)
 
 A full fledged instagram clone built entirely on JavaScript Tech Stack
 
 
 ## Demo
 
-### check out the app [here!](https://expo.dev/artifacts/eas/2ZLYw2ymqF9kLXnwgs6Vug.apk)
+### check out the app [here!](https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk)
 
 ## APK Link
 
 ```bash
-  https://expo.dev/artifacts/eas/2ZLYw2ymqF9kLXnwgs6Vug.apk
+  https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk
 ```
 
 ## Screenshots  

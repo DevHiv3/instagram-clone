@@ -7,7 +7,7 @@ const appLink = "instagramclone://"
 
 const initialState = {
     user: null,
-    base_url: localHostUrl,
+    base_url: productionUrl,
     applink: appLink
     }
 
