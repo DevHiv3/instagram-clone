@@ -316,7 +316,7 @@ export default function ProfileScreen(){
             :
             <View> 
               {!followers.includes(userId) ? 
-              <TouchableOpacity onPress={follow} style={tw`bg-[#1f1f1f] p-2 pl-12 pr-12 m-2 rounded`}>
+              <TouchableOpacity onPress={follow} style={tw`bg-blue-400 p-2 pl-12 pr-12 m-2 rounded`}>
               <Text style={tw`text-white font-bold`}>   follow   </Text>
             </TouchableOpacity>
               :

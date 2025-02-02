@@ -40,30 +40,6 @@ export default function SettingsScreen(){
           shouldSetBadge: false,
         }),
       });
-    
-      useEffect(() => {
-        // Register for push notifications
-        registerForPushNotificationsAsync()
-    
-        // Listener for incoming notifications
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-          setNotification(notification);
-        });
-    
-        // Listener for user interaction with the notification
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        //  console.log('User interacted with the notification:', response);
-        const route = response.notification.request.content.data.route; // Route from the notification payload
-        if (route) {
-          navigation.navigate(route); // Navigate to the specified route
-        }
-        });
-    
-        return () => {
-          Notifications.removeNotificationSubscription(notificationListener.current);
-          Notifications.removeNotificationSubscription(responseListener.current);
-        };
-      }, []);
       
       useEffect(() => {
         const checkAuth = async () => {
@@ -72,11 +48,29 @@ export default function SettingsScreen(){
             
             if (storedToken) {
                 setToken(storedToken)
-                if(!localDeviceToken){
-                  setTurn(false);          
+                if(localDeviceToken === null){
+                  setTurn(false);
+                  console.log("If there is no saved push token: ", localDeviceToken)
                 } else {
-                  console.log("my saved push token: ", localDeviceToken)
+                  console.log("My saved push token: ", localDeviceToken)
                   setTurn(true)
+                  // Listener for incoming notifications
+                  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+                    setNotification(notification);
+                  });
+
+                  // Listener for user interaction with the notification
+                  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+                  //  console.log('User interacted with the notification:', response);
+                  const route = response.notification.request.content.data.route; // Route from the notification payload
+                  if (route) {
+                    navigation.navigate(route);
+                  }
+                  });
+                  return () => {
+                    Notifications.removeNotificationSubscription(notificationListener.current);
+                    Notifications.removeNotificationSubscription(responseListener.current);
+                  };
                 }
             } else {
                 navigation.replace("Signup")
@@ -119,10 +113,24 @@ export default function SettingsScreen(){
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${storedToken}`
             },
-            body: JSON.stringify({ pushToken: pushToken }),
+            body: JSON.stringify({ pushToken: deviceToken }),
           });
 
           const result = await response.json()
+    }
+
+    const removeTokenFromServer = async()=>{
+      const storedToken = await SecureStore.getItemAsync("token")
+      const link = `${base_url}/remove-push-token`;
+      const response = await fetch(link, {
+          method: 'PUT',
+          headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${storedToken}`
+          },
+        });
+
+        const result = await response.json()
     }
 
     const registerForPushNotificationsAsync = async () => {
@@ -140,9 +148,10 @@ export default function SettingsScreen(){
           }
 
           const deviceToken = (await Notifications.getExpoPushTokenAsync()).data;
-          console.log('Device Push Token:', deviceToken);
           setPushToken(deviceToken)
+          await pushTokenToServer(deviceToken)
           await SecureStore.setItemAsync("push-token", deviceToken)
+          ToastAndroid.show("Notification are turned on!", ToastAndroid.SHORT);
         } else {
           Alert.alert('Must use physical device for Push Notifications');
         }
@@ -158,17 +167,14 @@ export default function SettingsScreen(){
       };
     
     const getNotification = async()=>{
-
-        registerForPushNotificationsAsync()
-
         if(!turn){
-            pushTokenToServer()
             setTurn(true)
-            ToastAndroid.show("Notification are turned on!", ToastAndroid.SHORT);
+            await registerForPushNotificationsAsync()
         } else {
-            await SecureStore.deleteItemAsync("push-token")
-            setPushToken("")
             setTurn(false)
+            await SecureStore.deleteItemAsync("push-token")
+            await removeTokenFromServer()
+            setPushToken("")
             ToastAndroid.show("Notifications turned off!", ToastAndroid.SHORT)
         }
     }
@@ -266,7 +272,7 @@ export default function SettingsScreen(){
             </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={pushTokenToServer} style={tw`flex flex-col justify-center mt-2 mb-2`}>
+        <TouchableOpacity style={tw`flex flex-col justify-center mt-2 mb-2`}>
             <View style={tw`flex flex-row justify-between items-center ml-4`}>
                 <View style={tw`flex flex-row`}>
                     <Entypo name="back-in-time" size={24} color="white" />

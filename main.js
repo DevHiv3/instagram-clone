@@ -54,7 +54,7 @@ export default function Navigator() {
       }
     }
 
-  //  checkForUpdates();
+    checkForUpdates();
   }, []);
 
   if (isUpdating) {

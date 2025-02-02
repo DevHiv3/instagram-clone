@@ -22,9 +22,6 @@ export default function HomeScreen() {
 
     const navigation = useNavigation()
     const base_url = useSelector(url)
-
-   const [currentUser] = useState({ profile_image: 'https://randomuser.me/api/portraits/men/73.jpg' });
-  
    const [refreshing, setRefreshing] = useState(false);
    const [ posts, setPosts ] = useState([]);
    const [ loading, setLoading ] = useState(true)
@@ -84,38 +81,7 @@ export default function HomeScreen() {
     }),
   })
 
-  const registerForPushNotificationsAsync = async () => {
-    
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        Alert.alert('Failed to get push token for push notification!');
-        return;
-      }
-  
-      const deviceToken = (await Notifications.getExpoPushTokenAsync()).data;
-           // console.log('Device Push Token:', deviceToken);
-      setPushToken(deviceToken)
-      await SecureStore.setItemAsync("push-token", deviceToken)
-      } else {
-        Alert.alert('Must use physical device for Push Notifications');
-      }
-  
-      if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
-        });
-      }
-    };
-
+ 
   const onRefresh = async()=>{
     setLoading(true)
     setRefreshing(true)
@@ -125,31 +91,6 @@ export default function HomeScreen() {
     setRefreshing(false)
     setLoading(false)   
   };
-
-
-useEffect(() => {
-  
-  registerForPushNotificationsAsync()
-    
-  // Listener for incoming notifications
-  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    setNotification(notification);
-  });
-    
-  // Listener for user interaction with the notification
-  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-  //  console.log('User interacted with the notification:', response);
-  const route = response.notification.request.content.data.route; // Route from the notification payload
-  if (route) {
-      navigation.navigate(route); // Navigate to the specified route
-  }
-  });
-    
-  return () => {
-    Notifications.removeNotificationSubscription(notificationListener.current);
-    Notifications.removeNotificationSubscription(responseListener.current);
-  };
-}, []);
 
   const fetchPosts = async(token)=>{
 
@@ -212,11 +153,32 @@ useEffect(() => {
         await fetchStories()
         await fetchProfile()
         setLoading(false)
-      
+
+        const localDeviceToken = await SecureStore.getItemAsync("push-token")
+        if(localDeviceToken === null){
+          ToastAndroid.show("Turn on notifications for better interactivity!", ToastAndroid.SHORT)
+        } else {
+          // Listener for incoming notifications
+          notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+             setNotification(notification)
+          })
+
+          responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            //  console.log('User interacted with the notification:', response);
+            const route = response.notification.request.content.data.route; // Route from the notification payload
+            if (route) {
+                navigation.navigate(route); // Navigate to the specified route
+            }
+          })
+
+          return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+          };
+        }
       } else {
         navigation.replace("Signup")
       }
-    
     };
     
     checkAuth();

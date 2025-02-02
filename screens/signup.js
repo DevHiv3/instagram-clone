@@ -2,9 +2,10 @@ import React, { useState, useEffect,useRef, useLayoutEffect }
  from "react"
 import PostProgressBar from "../components/post-progress-bar"
 import * as Linking from "expo-linking";
-import { StyleSheet, Text, View, SafeAreaView, Alert, ToastAndroid, ScrollView, TextInput, TouchableOpacity,StatusBar, Dimensions, TouchableWithoutFeedback,Keyboard, Platform, KeyboardAvoidingView, FlatList, Button } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView, Image, Alert, ToastAndroid, ScrollView, TextInput, TouchableOpacity,StatusBar, Dimensions, TouchableWithoutFeedback,Keyboard, Platform, KeyboardAvoidingView, FlatList, Button } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Avatar } from "@rneui/themed";
+import tw from "twrnc"
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from 'react-native-elements';
@@ -34,6 +35,7 @@ export default function SignupScreen(){
 	const [ email, setEmail ] = useState("")
   const [ password, setPassword ] = useState("")
   const [ image, setImage ] = useState(null)
+  const [ selectedImage, setSelectedImage ] = useState("")
   const [ open, setOpen ] = useState(false)
   const [ progressBoolean, setProgressBoolean ] = useState(false)
 
@@ -47,10 +49,11 @@ export default function SignupScreen(){
     });
 
     console.log(result);
-    ToastAndroid.show("image selected!", ToastAndroid.SHORT);
-
+    
     if (!result.canceled) {
+      ToastAndroid.show("image selected!", ToastAndroid.SHORT);
       setImage(result);
+      setSelectedImage(result.assets[0].uri)
       console.log(result.assets[0].uri)
     }
   };
@@ -120,15 +123,21 @@ export default function SignupScreen(){
   const signup = async()=>{
 
     if(image == null){
-      Alert.alert("please fill the required details")
+      ToastAndroid.show("Please choose an image to continue!", ToastAndroid.SHORT)
 
+    } else if(!username){
+      ToastAndroid.show("Please fill all the necessary details to continue!", ToastAndroid.SHORT)
+    }  else if(!password){
+      ToastAndroid.show("Please fill all the necessary details to continue!", ToastAndroid.SHORT)
+    } else if(!email){
+      ToastAndroid.show("Please fill all the necessary details to continue!", ToastAndroid.SHORT)
     } else {
       setProgressBoolean(true)
-    const photo = {
-      uri: image.assets[0].uri,
-      name: image.assets[0].filename,
-      type: image.assets[0].mimeType
-    }
+      const photo = {
+        uri: image.assets[0].uri,
+        name: image.assets[0].filename,
+        type: image.assets[0].mimeType
+      }
 
     const response = await FileSystem.uploadAsync(`${base_url}/signup`, image.assets[0].uri, {
       headers: {
@@ -234,6 +243,11 @@ export default function SignupScreen(){
         <VerifyOTPModal open={open} close={()=> setOpen(false)}  message={"Enter OTP"} email={email} proceed={()=> { setOpen(false); navigation.replace("Home") }} />
         <Text style={styles.welcomeText}>Welcome!</Text>
         <Text style={styles.loginText}>Signup</Text>
+
+        <TouchableOpacity onPress={pickImage} style={tw`flex flex-row w-full items-center justify-center`}>
+          <Image style={tw`h-20 w-20 rounded-full border-4 border-gray-700`} source={{ uri: selectedImage }} />
+        </TouchableOpacity>
+         
         <TextInput
           placeholder='username'
           value={username}
@@ -269,14 +283,14 @@ export default function SignupScreen(){
           textContentType='password'
         />
         
-        <TouchableOpacity onPress={()=> signup()} style={styles.loginButton}>
+        <TouchableOpacity onPress={signup} style={styles.loginButton}>
           <Text style={styles.loginButtonText}>Signup</Text>
         </TouchableOpacity>
         <View style={styles.loginWithBar}>
           <TouchableOpacity onPress={handleGoogleLogin} style={styles.iconButton}>
             <Icon name='google' type='font-awesome' size={30} color='#808e9b' />
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=> Alert.alert("HI")} style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton}>
             <Icon
               name='facebook-square'
               type='font-awesome'
@@ -284,7 +298,7 @@ export default function SignupScreen(){
               color='#808e9b'
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={pickImage} style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton}>
             <Icon name='apple' type='font-awesome' size={30} color='#808e9b' />
           </TouchableOpacity>
         </View>
