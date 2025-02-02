@@ -237,9 +237,9 @@ const UserList = ({ user }) =>(
     
      {!query ? 
       <FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={[1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0]} renderItem={()=> <View />} key={3} numColumns={3} /> :   
-    <View style={tw`w-full h-full`}>
-      {users.map((data)=> <UserList user={data} />)}
-    </View>
+    <ScrollView style={tw`w-full h-full`}>
+      {users.map((data, index)=> <UserList user={data} key={index} />)}
+    </ScrollView>
     }
 
     <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>

@@ -6,11 +6,11 @@ import { Ionicons, Feather, FontAwesome, AntDesign, FontAwesome5, Entypo, Materi
 import {  base_url as url } from "../slices/authSlice";
 import tw from "twrnc"
 import { formatDistanceToNowStrict } from "date-fns";
+import NotificationSkeletonScreen from '../components/notification-placeholder';
 import { useSelector } from 'react-redux';
 
 const { width, height } = Dimensions.get("window")
 const IMAGE_SIZE = width / 3 - 10;
-
 
 export default function NotificationScreen(){
 
@@ -39,6 +39,7 @@ export default function NotificationScreen(){
     const [ notifications, setNotifications ] = useState([])
     const [refreshing, setRefreshing] = useState(false);
     const base_url = useSelector(url)
+    const [ loading, setLoading ] = useState(true)
 
     const fetchNotifications = async()=>{
       try {
@@ -58,8 +59,9 @@ export default function NotificationScreen(){
         ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
         ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
         console.error("Error: ", error)
+      } finally {
+        setLoading(false)
       }
-      
     }
     
         useEffect(() => {
@@ -78,8 +80,11 @@ export default function NotificationScreen(){
           }, []);
 
     const onRefresh = async()=>{
+      setLoading(true)
       setRefreshing(true)
       fetchNotifications()
+      setRefreshing(false)
+      setLoading(false)
     };
 
   const NotificationsList = ({ notification }) =>(
@@ -106,7 +111,8 @@ export default function NotificationScreen(){
 
   return (
         <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        {notifications.map((data, index)=> <NotificationsList key={index} notification={data} />)}
+          {loading ? <NotificationSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> :
+          <View> {notifications.map((data, index)=> <NotificationsList key={index} notification={data} />)} </View>}
         </ScrollView>
   )
 }

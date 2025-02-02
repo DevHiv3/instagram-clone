@@ -8,6 +8,6 @@ export default async function FindStory(req,res){
         
     } catch(error){
         console.log("Internal Server error: ", error)
-        return resizeBy.status(500).json({ message: "Internal Server Error" })
+        return res.status(500).json({ message: "Internal Server Error" })
     }
 }

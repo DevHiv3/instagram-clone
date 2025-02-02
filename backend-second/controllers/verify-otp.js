@@ -16,10 +16,10 @@ export default async function VerifyOTP(req,res){
 
         console.log(code, otp)
 
-        if(Number(otp) === code){
-            console.log(code === otp)
+        if(Number(otp) === Number(code)){
             return res.status(200).json({ message: "success" })
         } else {
+            console.log("Invalid Credentials")
             return res.status(200).json({ message: "Invalid Credentials" })
         }
 

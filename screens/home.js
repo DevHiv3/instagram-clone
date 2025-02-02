@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, ScrollView, Platform, TouchableOp
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import * as Device from "expo-device";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, } from "@react-navigation/native";
 import * as SecureStore from 'expo-secure-store';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { FontAwesome } from "@expo/vector-icons";
@@ -11,6 +11,7 @@ import Octicons from '@expo/vector-icons/Octicons';
 import { useSelector } from "react-redux";
 import Post from "../components/post";
 import * as Notifications from 'expo-notifications';
+import HomeSkeletonScreen from "../components/home-placeholder"
 import { base_url as url } from "../slices/authSlice";
 
 import tw from "twrnc"
@@ -20,15 +21,13 @@ const { width, height } = Dimensions.get("window")
 export default function HomeScreen() {
 
     const navigation = useNavigation()
-    const route = useRoute()
     const base_url = useSelector(url)
 
-   const [currentUser] = useState({
-    profile_image: 'https://randomuser.me/api/portraits/men/73.jpg',
-  });
+   const [currentUser] = useState({ profile_image: 'https://randomuser.me/api/portraits/men/73.jpg' });
   
    const [refreshing, setRefreshing] = useState(false);
    const [ posts, setPosts ] = useState([]);
+   const [ loading, setLoading ] = useState(true)
    const [ token, setToken ] = useState("")
    const [ stories, setStories ] = useState([]);
    const [ userId, setUserId ] = useState("")
@@ -72,7 +71,7 @@ export default function HomeScreen() {
         } catch(error){
           console.error("Error: ", error)
         } finally {
-            //  setLoading(false)
+            setLoading(false)
         }
       }
 
@@ -117,9 +116,14 @@ export default function HomeScreen() {
       }
     };
 
-  const onRefresh = ()=>{
-    fetchPosts()
-    fetchStories()
+  const onRefresh = async()=>{
+    setLoading(true)
+    setRefreshing(true)
+    await fetchPosts()
+    await fetchStories()
+    await fetchProfile()
+    setRefreshing(false)
+    setLoading(false)   
   };
 
 
@@ -146,16 +150,6 @@ useEffect(() => {
     Notifications.removeNotificationSubscription(responseListener.current);
   };
 }, []);
-
-  const reload = async()=>{
-    try{
-      fetchPosts()
-      fetchStories()
-      
-    } catch(error){
-      console.error("Error: ", error)
-    } 
-  }
 
   const fetchPosts = async(token)=>{
 
@@ -214,9 +208,10 @@ useEffect(() => {
           navigation.replace("Signup")
         }
         
-        fetchPosts()
-        fetchStories()
-        fetchProfile()
+        await fetchPosts()
+        await fetchStories()
+        await fetchProfile()
+        setLoading(false)
       
       } else {
         navigation.replace("Signup")
@@ -264,6 +259,8 @@ useEffect(() => {
   
     return (
         <View style={{ ...styles.container }}>
+
+      {loading ? <HomeSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> :
            
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       
@@ -293,7 +290,9 @@ useEffect(() => {
           </View>}
         </View> 
         <View style={{ height: 20 }}></View>
-      </ScrollView>
+      </ScrollView>}
+
+
       <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>
       <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>

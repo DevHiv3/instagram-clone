@@ -6,9 +6,9 @@ import { AntDesign, Ionicons, Feather, FontAwesome, Entypo, FontAwesome5 } from 
 import { useSelector, useDispatch } from 'react-redux';
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade }from "rn-placeholder";
 import { base_url as url } from '../slices/authSlice'
+import UserSkeletonScreen from "../components/user-placeholder"
 import Octicons from '@expo/vector-icons/Octicons';
 import tw from "twrnc"
-import { max } from 'date-fns';
 
 const { width, height } = Dimensions.get("window")
 
@@ -25,6 +25,7 @@ export default function FollowersScreen(){
     const [ user, setUser ] = useState({})
     const [ userId, setUserId ] = useState("")
     const [ users, setUsers ] = useState([])
+    const [ loading, setLoading ] = useState(true)
     const [ followers, setFollowers ] = useState([])
     const [ isAdmin, setIsAdmin ] = useState(false)
 
@@ -71,8 +72,10 @@ export default function FollowersScreen(){
     const maxLength = 16;
 
     const onRefresh = async()=>{
+      setLoading(true)
       await fetchProfile();
       await fetchUsers();
+      setLoading(false)
     }
 
     const fetchProfile = async()=>{
@@ -124,6 +127,7 @@ export default function FollowersScreen(){
         const resp = await res.json()
         setFollowers(resp.followers)
         setUser(resp)
+        setLoading(false)
         if(resp.id === uid){
           setIsAdmin(true)
         }
@@ -184,7 +188,7 @@ export default function FollowersScreen(){
   return (
         <View style={styles.container}>
           <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} style={tw`w-full h-full`}>
-            {(users || []).map((data, index)=> <UserList follower={data} key={index} />)}
+          {loading ? <UserSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> : <View> {(users || []).map((data, index)=> <UserList follower={data} key={index} />)} </View>}
           </ScrollView>
       </View>
   )

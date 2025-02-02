@@ -4,6 +4,7 @@ import { StyleSheet, Text, View,  KeyboardAvoidingView, Button, Platform, ToastA
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import * as Updates from "expo-updates";
 import SignupScreen from "./screens/signup"
 import LoginScreen from "./screens/login"
 import HomeScreen from './screens/home';
@@ -29,6 +30,38 @@ import AboutScreen from './screens/about';
 const Stack = createNativeStackNavigator()
 
 export default function Navigator() {
+
+  const [isUpdating, setIsUpdating] = useState(true);
+
+  useEffect(() => {
+    async function checkForUpdates() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          Alert.alert(
+            "Update Available",
+            "A new version is available. The app will restart to apply updates.",
+            [{ text: "OK", onPress: () => Updates.reloadAsync() }]
+          );
+        }
+      } catch (error) {
+        console.error("Error checking for updates:", error);
+      } finally {
+        setIsUpdating(false); // Hide the loader and show the app
+      }
+    }
+
+    checkForUpdates();
+  }, []);
+
+  if (isUpdating) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
 
   const linking = {
     prefixes: ['instagramclone://'], // Define the custom scheme
@@ -83,7 +116,7 @@ export default function Navigator() {
                 <Stack.Screen name="Create-Story" component={CreateStory} options={{ headerShown: true }} />
                 <Stack.Screen name="Photo" component={PhotoScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="About" component={AboutScreen} options={{ headerShown: true }} />
-
+               
           </Stack.Navigator>
         
         </KeyboardAvoidingView>

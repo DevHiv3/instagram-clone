@@ -108,8 +108,6 @@ export default function SignupScreen(){
 
     const result = await response.json()
     if(result.message === "success"){
-      await SecureStore.setItemAsync("token", token)
-      await SecureStore.setItemAsync("id", uid)
       setProgressBoolean(false)
       setOpen(true)
     } else if(result.message === "Invalid Credentials"){
@@ -122,6 +120,8 @@ export default function SignupScreen(){
   }
 
   const otpVerified = async()=>{
+    await SecureStore.setItemAsync("token", token)
+    await SecureStore.setItemAsync("id", uid)
     setOpen(false);
     setProgressBoolean(false);
     navigation.replace("Home")
@@ -145,7 +145,7 @@ export default function SignupScreen(){
         style={styles.container}
       >
         <PostProgressBar open={progressBoolean} close={()=> setProgressBoolean(false)} message={" please wait..."} progress={100} />
-         <VerifyOTPModal open={open} close={()=> setOpen(false)}  message={"Enter OTP"} email={email} proceed={otpVerified} showLoading={()=> setProgressBoolean(true)} removeLoading={()=> setProgressBoolean(false)} />
+         <VerifyOTPModal open={open} close={()=> setOpen(false)}  message={"Enter OTP"} email={email} proceed={otpVerified} showLoading={()=> setProgressBoolean(true)} removeLoading={()=> setProgressBoolean(false)}  />
          <VerifyOTPModal open={verifyPassBoolean} close={()=> setVerifyPassBoolean(false)}  message={"Enter OTP"} showLoading={()=> setProgressBoolean(true)} email={email} proceed={changePass} />
          <EmailInputModal open={EmailInputBoolean} close={()=> setEmailInputBoolean(false)}  message={"Enter your email"} showLoading={()=> setProgressBoolean(true)} proceed={(mail)=> { setEmailInputBoolean(false); setEmail(mail); setProgressBoolean(false);  setVerifyPassBoolean(true); }} />
          <ChangePasswordModal open={forgotPassBoolean} close={()=> setForgotPassBoolean(false)} message={"Enter your password"} email={email} showLoading={()=> setProgressBoolean(true)}  proceed={()=> { setForgotPassBoolean(false); setProgressBoolean(false); navigation.replace("Home") }} />

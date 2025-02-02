@@ -1,11 +1,14 @@
-import { View, Text, Alert, StyleSheet, FlatList, Image, RefreshControl , Dimensions, TouchableOpacity, ToastAndroid, ScrollView } from 'react-native'
+import { View, Text, Alert, Share, StyleSheet, FlatList, Image, RefreshControl , Dimensions, TouchableOpacity, ToastAndroid, ScrollView } from 'react-native'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store';
 import { AntDesign, Ionicons, Feather, FontAwesome, Entypo, FontAwesome5 } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade }from "rn-placeholder";
 import { base_url as url } from '../slices/authSlice'
+import ProfileSkeletonScreen from "../components/profile-placeholder"
 import Octicons from '@expo/vector-icons/Octicons';
 import tw from "twrnc"
 
@@ -24,10 +27,14 @@ export default function ProfileScreen(){
       const [ loading, setLoading ] = useState(true)
 
       const onRefresh = async()=>{
+        setRefreshing(true)
+        setLoading(true)
         const storedToken = await SecureStore.getItemAsync('token');
         fetchPosts(storedToken)
         fetchUserProfile(storedToken)
         fetchProfile(storedToken)
+        setLoading(false)
+        setRefreshing(false)
       };
 
     const navigation = useNavigation()
@@ -39,6 +46,31 @@ export default function ProfileScreen(){
     const [ hasFollowed, setHasFollowed ] = useState(false)
     const [ followings, setFollowings ] = useState([])
     const [ isAdmin, setIsAdmin ] = useState(false)
+
+    const shareProfile = async () => {
+      try {
+        const fileUri = FileSystem.cacheDirectory + `shared-image.jpg`;
+        const { uri } = await FileSystem.downloadAsync(user.photo, fileUri);
+        const textToShare = "Check out my Profile!"
+        const urlToShare = "https://instagram-clone.expo.app/"
+
+        if (!(await Sharing.isAvailableAsync())) {
+          Alert.alert("Sharing is not available on this device.");
+          return;
+        }
+
+        await Share.share({
+          message: `${textToShare}\n\n${urlToShare}`, // Text and URL combined
+          url: uri,
+        })
+
+        await Sharing.shareAsync(uri);
+        
+      } catch (error) {
+        console.error(error);
+        Alert.alert("Error", "Something went wrong while sharing.");
+      }
+    };
 
     const addRoom = async()=>{
       const storedToken = await SecureStore.getItemAsync('token');
@@ -177,7 +209,6 @@ export default function ProfileScreen(){
           if(result.id == uid){
             setIsAdmin(true)
           }
-
         } catch(error){
           ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
           ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
@@ -236,17 +267,17 @@ export default function ProfileScreen(){
 
   return (
         <View style={styles.container}>
+
+          {loading ? <ProfileSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> :
         
-        <ScrollView scrollEnabled={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={tw`flex flex-row justify-between items-center`}>
             <Text style={tw`font-extrabold text-2xl text-white pl-4`}><Ionicons name="lock-closed-outline" size={24} color="white" />{loading ? "" : user.username}</Text>
             {isAdmin ? <TouchableOpacity onPress={()=> navigation.replace("Create-Story")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity> : <TouchableOpacity><Feather name="bell" size={30} color="white" /></TouchableOpacity>}
-            {isAdmin ? <TouchableOpacity onPress={()=> navigation.navigate("Settings")} style={tw`pr-6`}><Feather name="menu" size={24} color="white" /></TouchableOpacity> : <TouchableOpacity onPress={()=> navigation.navigate("About", { id: user.id, photo: user.photo, username: user.username, timestamp: user.timestamp})} style={tw`pr-6`}><Feather name="more-vertical" size={24} color="white" /></TouchableOpacity>}
-            
+            {isAdmin ? <TouchableOpacity onPress={()=> navigation.navigate("Settings")} style={tw`pr-6`}><Feather name="menu" size={24} color="white" /></TouchableOpacity> : <TouchableOpacity onPress={()=> navigation.navigate("About", { id: user.id, photo: user.photo, username: user.username, timestamp: user.timestamp})} style={tw`pr-6`}><Feather name="more-vertical" size={24} color="white" /></TouchableOpacity>} 
         </View>
 
         <View style={tw`flex flex-row justify-evenly items-center`}>
-        
             <View style={tw`flex flex-col justify-center items-center h-28 w-28`}>
                 <TouchableOpacity onLongPress={()=> navigation.navigate("Photo", { photo: user.photo })} delayLongPress={500} onPress={()=> navigation.navigate("Story", { id: user.id, username: user.username, avatar: user.photo })}>
                   <Image style={tw`h-20 w-20 rounded-full border-4 border-gray-700`} source={{ uri: loading ? "" : user.photo }} />
@@ -297,7 +328,7 @@ export default function ProfileScreen(){
             </View>
           }
           {isAdmin ?
-          <TouchableOpacity style={tw`bg-[#1f1f1f] p-2 pl-12 pr-12 m-2 rounded`}>
+          <TouchableOpacity onPress={shareProfile} style={tw`bg-[#1f1f1f] p-2 pl-12 pr-12 m-2 rounded`}>
             <Text style={tw`text-white font-bold`}>Share Profile </Text>
           </TouchableOpacity>
            : 
@@ -323,7 +354,8 @@ export default function ProfileScreen(){
           <FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={posts} renderItem={ProfilePosts} key={3} numColumns={3} />
         </View>
         
-        </ScrollView>
+        </ScrollView>}
+
 
     <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>
       <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>

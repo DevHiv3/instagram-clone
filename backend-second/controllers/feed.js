@@ -9,7 +9,7 @@ export default async function Feed(req,res){
             return res.status(404).json({ message: 'no-user-found' });
         }
     
-        const posts = await Post.find({ admin:{ $in: user.followings } }).populate("comments.postedBy", "username photo _id").populate("admin", "username photo _id");
+        const posts = await Post.find({ admin:{ $in: user.followings } }).populate("comments.postedBy", "username photo _id").populate("admin", "username photo _id").sort({ timestamp: -1 });
         return res.status(200).json({ message: "success", posts: posts })
 
     } catch(error){

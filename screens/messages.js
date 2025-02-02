@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { base_url as url } from '../slices/authSlice'
 import Modal from '../components/modal';
 import { useSelector } from 'react-redux';
+import UserSkeletonScreen from "../components/user-placeholder"
 import { formatDistanceToNowStrict, formatDistanceToNow } from "date-fns";
 import { useFonts, Inter_900Black, Inter_100Thin,
   Inter_200ExtraLight,
@@ -30,6 +31,7 @@ export default function MessagesScreen(){
 
     const navigation = useNavigation()
     const base_url = useSelector(url)
+    const [ loading, setLoading ] = useState(true)
     const [ token, setToken ] = useState("")
     const [ selectedRoomId, setSelectedRoomId ] = useState("")
     const [ selectedReceiver, setReceiver ] = useState("")
@@ -89,6 +91,8 @@ export default function MessagesScreen(){
 
       } catch(error){
         console.error("Error: ", error)
+      } finally {
+        setLoading(false)
       }
     }
   
@@ -120,16 +124,16 @@ export default function MessagesScreen(){
           
         } catch(error){
           console.error("Error: ", error)
-        } finally {
-        //  setLoading(false)
-        }
+        } 
     }
     
 
   const [refreshing, setRefreshing] = useState(false);
 
-      const onRefresh = ()=>{
-        fetchRooms()
+      const onRefresh = async()=>{
+        setLoading(true)
+        await fetchRooms()
+        setLoading(false)
       };
     
       const RoomList = ({ room })=> (
@@ -169,7 +173,8 @@ export default function MessagesScreen(){
 
       {/* Chats */}
       <ScrollView style={tw`w-full h-full`} showsHorizontalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      {rooms.map((data, index)=> <RoomList key={index} room={data} />)}
+
+      {loading ? <UserSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> : <View>{rooms.map((data, index)=> <RoomList key={index} room={data} />)}</View>}
       </ScrollView>
 
     </SafeAreaView>

@@ -1,6 +1,6 @@
 import Notification from '../models/notification.js'
 import User from "../models/user.js"
-import getAccessToken from '../config/get-fcm-token.js';
+//import getAccessToken from '../config/get-fcm-token.js';
 import "dotenv/config"
 
 export default async function CreateNotification(req,res){
