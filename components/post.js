@@ -7,7 +7,7 @@ import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import { BottomSheet,  Button, ListItem } from '@rneui/themed';
+import { BottomSheet, Button, ListItem } from '@rneui/themed';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from "react-native-reanimated";
@@ -215,6 +215,7 @@ export default function Post({ content, token, userId, isAdmin }) {
       const result = await response.json()
       
       if(result.message === "success"){
+        setComment("")
         reload()
         ToastAndroid.show("comment uploaded!", ToastAndroid.SHORT)
         if(post.admin._id === userId){
@@ -248,8 +249,6 @@ export default function Post({ content, token, userId, isAdmin }) {
             receiver: post.admin._id
           })
         })
-        setComment("")
-        reload()
       }
     }
     } catch(error){
@@ -507,19 +506,19 @@ export default function Post({ content, token, userId, isAdmin }) {
           <Text style={tw`text-neutral-400 px-4 mb-6`}>{formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}</Text>
 
           {/* COMMENT SECTION */}
-          <BottomSheet modalProps={{}} isVisible={isVisible}>
+          <BottomSheet onBackdropPress={() => setIsVisible(false)} isVisible={isVisible}>
 
             {/* COMMENT CONTAINER */}
-            <ScrollView style={tw`h-160 bg-neutral-900`}>
+            <View style={tw`h-120 bg-neutral-900`}>
               <Text style={tw`text-white font-bold text-center mt-4 mb-6 border-b-2 border-gray-800`}>Comments</Text>
 
               {/* COMMENT */}
               {!post ? 
               <View></View> : 
-              <View>
+              <ScrollView scrollEnabled={true}>
                 {comments.map((postComment, index)=> <CommentComponent key={index} postComment={postComment} />)}
-              </View>}
-            </ScrollView>
+              </ScrollView>}
+            </View>
 
             {/* COMMENT INPUT */} 
             <View style={tw`flex flex-row justify-center items-center bg-neutral-800 `}>
