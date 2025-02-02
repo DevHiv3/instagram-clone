@@ -23,7 +23,14 @@
       "developmentClient": true
     },
     "production": {
-      "autoIncrement": true
+      "channel": "production",
+      "autoIncrement": true,
+      "developmentClient": false
+    },
+    "staging": {
+      "channel": "staging",
+      "distribution": "internal",
+      "developmentClient": true
     }
   },
   "submit": {
