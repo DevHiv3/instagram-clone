@@ -5,7 +5,7 @@ A full fledged instagram clone built entirely on JavaScript Tech Stack
 
 ## Demo
 
-### check out the app [here!](https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk)
+### check out the app [here!](https://instagram-clone-qoyv.onrender.com)
 
 ## APK Link
 
@@ -42,6 +42,8 @@ A full fledged instagram clone built entirely on JavaScript Tech Stack
 - Remove follower 👤
 - OTP verification 📲
 
+
+## (TERMS AND CONDITIONS)[https://instagram-clone-qoyv.onrender.com]
 
 ## Tech Stack
 

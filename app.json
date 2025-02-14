@@ -13,7 +13,8 @@
       "backgroundColor": "#2f2f2f"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.instagramclone.app"
     },
     "android": {
       "package": "com.instagramclone.app",

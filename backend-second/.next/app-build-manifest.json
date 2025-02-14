@@ -1,0 +1,52 @@
+{
+  "pages": {
+    "/not-found": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/chunks/app/not-found-4bf10fc9aeb4b15e.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/chunks/app/_not-found/page-50c4dd1deefc3854.js"
+    ],
+    "/layout": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/css/42d76a8c3c472d1c.css",
+      "static/chunks/app/layout-ddb2e18d054cd641.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/chunks/9c4e2130-40541cebbd88632b.js",
+      "static/chunks/ee560e2c-a78afc82a0855829.js",
+      "static/chunks/8e1d74a4-1e094499ba61662a.js",
+      "static/chunks/479ba886-8815d966a59ec2a0.js",
+      "static/chunks/967-b9163ebf1b4e416c.js",
+      "static/chunks/app/page-75afad1cdee76a5d.js"
+    ],
+    "/about/layout": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/chunks/app/about/layout-b218791a62db086d.js"
+    ],
+    "/about/page": [
+      "static/chunks/webpack-6027091fcd747cba.js",
+      "static/chunks/4bd1b696-dfeb7203a28d1e68.js",
+      "static/chunks/517-1fffdb6c0993db27.js",
+      "static/chunks/main-app-cdb66b61300f4f0b.js",
+      "static/chunks/app/about/page-5200e4f707bbad46.js"
+    ]
+  }
+}
