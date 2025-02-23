@@ -14,7 +14,7 @@ function DevInfo(){
       </div>
       <div className="flex flex-col w-96 text-left">
         
-         <div className="flex flex-col space-y-4 bg-black  text-white bg-opacity-50 rounded-lg font-semibold m-4 shadow-md p-6 transition-transform duration-300 text-xl transform hover:-translate-y-1 hover:shadow-2xl">
+         <div className="flex flex-col space-y-4 bg-black  text-white bg-opacity-50 rounded-lg font-semibold m-4 p-6 text-xl shadow-md transition-transform duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
            <span className="font-extrabold text-4xl text-white uppercase orbitron-font">Overview </span>
            
            <span className="text-base font-normal banner-text">

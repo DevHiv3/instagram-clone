@@ -2,15 +2,19 @@ import { View, Text, Alert, Share, StyleSheet, FlatList, Image, RefreshControl ,
 import { useState, useEffect, useRef } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import * as SecureStore from 'expo-secure-store';
-import { AntDesign, Ionicons, Feather, FontAwesome, Entypo, FontAwesome5 } from '@expo/vector-icons';
+import { AntDesign, Ionicons, Feather, FontAwesome, Entypo, FontAwesome5, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import { Placeholder, PlaceholderMedia, PlaceholderLine, Fade }from "rn-placeholder";
 import { base_url as url } from '../slices/authSlice'
+import { Video } from "expo-av";
 import ProfileSkeletonScreen from "../components/profile-placeholder"
 import Octicons from '@expo/vector-icons/Octicons';
+import { BottomSheet,  Button, ListItem } from '@rneui/themed';
 import tw from "twrnc"
+import Modal from '../components/modal';
+import { ButtonGroup } from '@rneui/themed';
 
 const { width, height } = Dimensions.get("window")
 const IMAGE_SIZE = width / 3 - 10
@@ -21,31 +25,53 @@ export default function ProfileScreen(){
      const { id } = route.params
      const [ token, setToken ] = useState("")
      const [ userId, setUserId ] = useState("")
+     const [ isVisible, setIsVisible ] = useState(false);
+     const [ reels, setReels ] = useState([])
      const base_url = useSelector(url)
+     const [refreshing, setRefreshing] = useState(false);
+     const [ loading, setLoading ] = useState(true)
+     const navigation = useNavigation()
+     const [ user, setUser ] = useState({})
+     const [ open, setOpen ] = useState(false);
+     const [ profile, setProfile ] = useState({})
+     const [ posts, setPosts ] = useState([])
+     const [ followers, setFollowers ] = useState([])
+     const [ followings, setFollowings ] = useState([])
+     const [ selectedReelId, setSelectedReelId ] = useState("")
+     const [ isAdmin, setIsAdmin ] = useState(false)
+     const [selectedIndex, setSelectedIndex] = useState(0);
 
-      const [refreshing, setRefreshing] = useState(false);
-      const [ loading, setLoading ] = useState(true)
+    const onRefresh = async()=>{
+      setRefreshing(true)
+      setLoading(true)
+      const storedToken = await SecureStore.getItemAsync('token');
+      fetchPosts(storedToken)
+      fetchReels(storedToken)
+      fetchUserProfile()
+      fetchProfile(storedToken)
+      setLoading(false)
+      setRefreshing(false)
+    };
 
-      const onRefresh = async()=>{
-        setRefreshing(true)
-        setLoading(true)
-        const storedToken = await SecureStore.getItemAsync('token');
-        fetchPosts(storedToken)
-        fetchUserProfile(storedToken)
-        fetchProfile(storedToken)
-        setLoading(false)
-        setRefreshing(false)
-      };
-
-    const navigation = useNavigation()
-
-    const [ user, setUser ] = useState({})
-    const [ profile, setProfile ] = useState({})
-    const [ posts, setPosts ] = useState([])
-    const [ followers, setFollowers ] = useState([])
-    const [ hasFollowed, setHasFollowed ] = useState(false)
-    const [ followings, setFollowings ] = useState([])
-    const [ isAdmin, setIsAdmin ] = useState(false)
+    const fetchReels = async(storedToken)=>{
+      try{
+        const link = `${base_url}/reels/${id}`
+        const response = await fetch(link, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${storedToken}`
+          },
+        })
+  
+        const result = await response.json()
+        setReels(result.data)
+      } catch(error){
+        ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+        ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
+        console.error("Error: ", error)
+      } 
+    }
 
     const shareProfile = async () => {
       try {
@@ -166,6 +192,31 @@ export default function ProfileScreen(){
       }
     }
 
+    const deleteReel = async()=>{
+      try{
+        const link = `${base_url}/reel/${selectedReelId}`
+        const response = await fetch(link, {
+          method: "DELETE",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+        })
+
+        const result = await response.json()
+        if(result.message == "success"){
+          await fetchReels()
+          setOpen(false)
+        }
+        
+      } catch(error){
+        ToastAndroid.show("An Error occurred!", ToastAndroid.SHORT)
+        ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
+        console.error("Error: ", error)
+      }
+
+    }
+
     const fetchProfile = async(token)=>{
       const userId = await SecureStore.getItemAsync("id")
       const uid = await SecureStore.getItemAsync('id');
@@ -189,7 +240,7 @@ export default function ProfileScreen(){
       }
     }
 
-      const fetchUserProfile = async()=>{
+   const fetchUserProfile = async()=>{
         const storedToken = await SecureStore.getItemAsync('token');
         const uid = await SecureStore.getItemAsync('id');
         try{
@@ -216,9 +267,9 @@ export default function ProfileScreen(){
         } finally {
            setLoading(false)
         }
-      }
+    }
 
-      const fetchPosts = async(token)=>{
+   const fetchPosts = async(token)=>{
 
         try{
           const link = `${base_url}/profile-posts/${id}`
@@ -238,16 +289,17 @@ export default function ProfileScreen(){
           ToastAndroid.show("Check your internet connection, try again!", ToastAndroid.SHORT)
           console.error("Error: ", error)
         } 
-      }
+    }
     
-        useEffect(() => {
+    useEffect(() => {
             const checkAuth = async () => {
               const storedToken = await SecureStore.getItemAsync('token');
               const uid = await SecureStore.getItemAsync('id');
               if (storedToken) {
-                fetchUserProfile(storedToken)
+                fetchUserProfile()
                 fetchProfile(storedToken)
                 fetchPosts(storedToken)
+                fetchReels(storedToken)
                 setToken(storedToken)
                 setUserId(uid)
               } else {
@@ -256,26 +308,92 @@ export default function ProfileScreen(){
             };
         
             checkAuth();
-          }, []);
+    }, []);
 
-          const ProfilePosts = ({ item , index}) => (
+    const ProfilePosts = ({ item , index }) => (
           <TouchableOpacity onPress={()=> navigation.navigate("Post", { id: item._id, profileId: item.admin._id, content: item })} key={index} style={styles.imageContainer}>
             <Image source={{ uri: item.photo }} style={styles.image} />
          </TouchableOpacity>
-         );
+    );
+
+    const ProfileReels = ({ item , index }) => (
+        <View>
+          {isAdmin ? 
+          <TouchableOpacity delayLongPress={500} onLongPress={()=> { setOpen(true); setSelectedReelId(item._id); }} onPress={()=> navigation.navigate("Reel", { reelId: item._id })} key={index} style={styles.imageContainer}>
+            <Video isMuted={true} source={{ uri: item.url }} shouldPlay={false} style={styles.image} />
+         </TouchableOpacity>
+         : 
+         <TouchableOpacity onPress={()=> navigation.navigate("Reel", { reelId: item._id })} key={index} style={styles.imageContainer}>
+            <Video isMuted={true} source={{ uri: item.url }} shouldPlay={false} style={styles.image} />
+         </TouchableOpacity>}
+
+        </View>
+    );
+
+    const PostsScreen = ()=><FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={posts} renderItem={ProfilePosts} key={3} numColumns={3} />
+    const ReelsScreen = ()=><FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={reels} renderItem={ProfileReels} key={3} numColumns={3} />
   
 
   return (
         <View style={styles.container}>
 
+          {/* POPUP FOR DELETING REELS */}
+          <Modal open={open} close={()=> setOpen(false)} message={" Do you want to delete this reel ?"} proceed={deleteReel} optionOne={"delete"} />
+
+          {/* BOTTOMSHEET FOR CREATING CONTENT */}
+          <BottomSheet modalProps={{}} isVisible={isVisible}>
+            <View style={tw`h-80 bg-neutral-900`}>
+
+              <TouchableOpacity onPress={()=> navigation.replace("Create-Story")} style={tw`flex flex-col justify-center mt-4 mb-4`}>
+                <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                  <View style={tw`flex flex-row`}>
+                    <AntDesign name="pluscircleo" size={30} color="white" />
+                    <Text style={tw`text-white text-lg ml-2`}>Create Story</Text>
+                  </View>
+                <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={()=> navigation.replace("Create")} style={tw`flex flex-col justify-center mt-4 mb-4`}>
+                <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                  <View style={tw`flex flex-row`}>
+                    <MaterialIcons name="grid-on" size={30} color="white" />
+                    <Text style={tw`text-white text-lg ml-2`}>Create Post</Text>
+                  </View>
+                  <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+                </View>
+              </TouchableOpacity>
+        
+               <TouchableOpacity onPress={()=> navigation.replace("Create-Reel")} style={tw`flex flex-col justify-center mt-4 mb-4`}>
+                  <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                   <View style={tw`flex flex-row`}>
+                     <Octicons name="video" size={30} color="white" />
+                     <Text style={tw`text-white text-lg ml-2`}>Create Reel</Text>
+                      </View>
+                    <MaterialIcons name="arrow-forward-ios" size={24} color="gray" /> 
+                  </View>
+                </TouchableOpacity>
+        
+                 <Button title={"Close"} onPress={()=> setIsVisible(false)} />
+            </View>
+            </BottomSheet>
+
+
+          {/* LOAD SKELETON OR PROFILE PAGE */}
+          
           {loading ? <ProfileSkeletonScreen refreshing={refreshing} onRefresh={onRefresh} /> :
         
         <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+
+          {/* USERNAME, CREATE BUTTON AND SETTINGS */}
+
         <View style={tw`flex flex-row justify-between items-center`}>
             <Text style={tw`font-extrabold text-2xl text-white pl-4`}><Ionicons name="lock-closed-outline" size={24} color="white" />{loading ? "" : user.username}</Text>
-            {isAdmin ? <TouchableOpacity onPress={()=> navigation.replace("Create-Story")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity> : <TouchableOpacity><Feather name="bell" size={30} color="white" /></TouchableOpacity>}
+            {isAdmin ? <TouchableOpacity onPress={()=> setIsVisible(true)}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity> : <TouchableOpacity><Feather name="bell" size={30} color="white" /></TouchableOpacity>}
             {isAdmin ? <TouchableOpacity onPress={()=> navigation.navigate("Settings")} style={tw`pr-6`}><Feather name="menu" size={24} color="white" /></TouchableOpacity> : <TouchableOpacity onPress={()=> navigation.navigate("About", { id: user.id, photo: user.photo, username: user.username, timestamp: user.timestamp})} style={tw`pr-6`}><Feather name="more-vertical" size={24} color="white" /></TouchableOpacity>} 
         </View>
+
+        {/* USER PROFILE STATS SUCH AS USERNAME, AVATAR, POSTS COUNT, FOLLOWERS COUNT */}
 
         <View style={tw`flex flex-row justify-evenly items-center`}>
             <View style={tw`flex flex-col justify-center items-center h-28 w-28`}>
@@ -306,9 +424,10 @@ export default function ProfileScreen(){
             
         </View>
 
+        {/* FOLLOW/UNFOLLOW, EDIT PROFILE AND SHARE PROFILE BUTTONS */}
+
         <View style={tw`flex flex-row justify-evenly items-center m-2`}>
 
-          
           {isAdmin ?
             <TouchableOpacity onPress={()=> navigation.navigate("Edit-Profile", { user: user })} style={tw`bg-[#1f1f1f] p-2 pl-12 pr-12 m-2 rounded`}>
                 <Text style={tw`text-white font-bold`}>Edit Profile</Text>
@@ -321,7 +440,7 @@ export default function ProfileScreen(){
             </TouchableOpacity>
               :
               <TouchableOpacity onPress={unfollow} style={tw`bg-[#1f1f1f] p-2 pl-12 pr-12 m-2 rounded`}>
-              <Text style={tw`text-white font-bold`}>unfollow </Text>
+              <Text style={tw`text-white font-bold`}>    unfollow   </Text>
             </TouchableOpacity>
             } 
             
@@ -338,6 +457,7 @@ export default function ProfileScreen(){
   
         </View>
 
+        {/* STORY HIGHLIGHTS */}
         <View style={tw`flex flex-row justify-between items-center ml-4 mr-4`}>
 
             <View style={tw`flex flex-col justify-center items-center`}>
@@ -350,18 +470,30 @@ export default function ProfileScreen(){
         </View>
 
         {/* ALL POSTS */}
-        <View>
-          <FlatList contentContainerStyle={styles.grid} keyExtractor={(item, index) => index.toString()} data={posts} renderItem={ProfilePosts} key={3} numColumns={3} />
-        </View>
+
+        <ButtonGroup
+        buttons={['Posts', 'Reels']}
+        selectedIndex={selectedIndex}
+        onPress={(index) => setSelectedIndex(index)}
+        containerStyle={tw`bg-transparent shadow-none border-2 border-black`}
+        selectedButtonStyle={tw`bg-[#1f1f1f] border-2 border-black`}
+        textStyle={tw`text-white font-bold`}
+        selectedTextStyle={tw`text-white font-bold`}
+      />
+
+      {/* ALL POSTS AND REELS */}
+
+        <View>{selectedIndex == 0 ? <PostsScreen /> : <ReelsScreen />}</View>
         
         </ScrollView>}
 
+        {/* BOTTOM NAVIGATION BAR */}
 
     <View style={[tw`z-2 fixed bottom-0 left-0 w-full h-20 pt-2 bg-black text-white flex flex-row justify-evenly `]}>
       <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Create")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity>
-      <TouchableOpacity onPress={()=> navigation.navigate("Notification")}><AntDesign name="hearto" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Reels")}><Octicons name="video" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=>{ navigation.navigate("Profile", { id: profile.id })}}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: profile.photo }} /></TouchableOpacity>
     </View>
       

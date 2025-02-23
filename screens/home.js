@@ -259,7 +259,7 @@ export default function HomeScreen() {
       <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Create")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity>
-      <TouchableOpacity onPress={()=> navigation.navigate("Notification")}><AntDesign name="hearto" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Reels")}><Octicons name="video" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=>{ navigation.navigate("Profile", { id: userId })}}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: user.photo }} /></TouchableOpacity>
     </View>
     </View>
@@ -269,12 +269,12 @@ export default function HomeScreen() {
 
   const styles = StyleSheet.create({
      container: {
-    flex: 1,
-    backgroundColor: '#000',
-    height: height,
-    width: width,
-    paddingTop: 40,
-  },
+       flex: 1,
+       backgroundColor: '#000',
+       height: height,
+       width: width,
+       paddingTop: 40,
+    },
 
   searchBarView: {
     height: 50,

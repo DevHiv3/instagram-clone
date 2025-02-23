@@ -61,7 +61,7 @@ function VerifyOTPModal({ open, close, message, proceed, showLoading, removeLoad
                   <Text style={tw`text-white text-lg font-bold ml-2`}>
                     {message}
                   </Text>
-                  <TouchableOpacity style={tw`ml-2`} onPress={()=>{ setEmail(""); close()}}>
+                  <TouchableOpacity style={tw`ml-2`} onPress={()=>{ setCode(""); close()}}>
                     <Entypo name="cross" size={24} color="white" />
                   </TouchableOpacity>
                   </View>

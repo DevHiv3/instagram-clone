@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const productionUrl = "https://instagram-clone-qoyv.onrender.com"
 const vercelProductionUrl = "https://instagram-clone-expo.vercel.app"
-const localHostUrl = "http://192.168.216.222:8080"
+const localHostUrl = "http://192.168.29.244:8080"
 const appLink = "instagramclone://"
 
 const initialState = {

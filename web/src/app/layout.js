@@ -28,9 +28,9 @@ export const metadata = {
     images: ["https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafybeidvpeaznv4pcszj2zljhhmnwyridf2lgul73h3yt674u22eskixbm"],
   },
   icons: {
-    icon: "https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafybeidvpeaznv4pcszj2zljhhmnwyridf2lgul73h3yt674u22eskixbm",
-    apple: "https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafybeidvpeaznv4pcszj2zljhhmnwyridf2lgul73h3yt674u22eskixbm",
-  },
+    icon: "/splash-screen-logo.webp",
+    apple: "/splash-screen-logo.webp",
+  }
 };
 
 const orbitron = Orbitron({

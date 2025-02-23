@@ -11,6 +11,7 @@ import PostRouter from "./routes/posts.js"
 import StoryRoutes from "./routes/story.js"
 import MessageRoutes from "./routes/message.js"
 import RoomsRoutes from "./routes/room.js"
+import ReelRoutes from "./routes/reel.js"
 import BookMarkRoutes from "./routes/bookmark.js"
 import NotificationRoutes from "./routes/notification.js"
 import passport from "./config/passport.js"
@@ -30,7 +31,7 @@ const handle = nextRouter.getRequestHandler();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors(corsOptions))
-app.use(morgan('combined'))
+app.use(morgan('dev'))
 app.use(passport.initialize());
 app.use(session({ secret: process.env.JWT_SECRET, resave: false, saveUninitialized: true, }));
 
@@ -42,6 +43,7 @@ app.use(MessageRoutes)
 app.use(RoomsRoutes)
 app.use(BookMarkRoutes)
 app.use(NotificationRoutes)
+app.use(ReelRoutes)
 
 //static files
 app.use(express.static('./views'))

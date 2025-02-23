@@ -24,6 +24,7 @@
         "foregroundImage": "./assets/splash-screen-logo.png",
         "backgroundColor": "#2f2f2f"
       },
+      
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.READ_EXTERNAL_STORAGE",
@@ -47,6 +48,7 @@
     "owner": "dev.hiv3",
     "plugins": [
       "expo-secure-store",
+      "@react-native-google-signin/google-signin",
       [
         "expo-image-picker",
         {

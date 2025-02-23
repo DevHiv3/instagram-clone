@@ -3,8 +3,6 @@ import Banner from "@/components/Banner";
 import AppFeatures from "@/components/app-features"
 import DevInfo from "@/components/dev-info";
 import Footer from "@/components/footer";
-import { AiTwotoneCheckCircle, AiFillInstagram, AiFillTwitterSquare,  AiFillLinkedin, AiFillGithub } from "react-icons/ai"
-
 
 export default function Home() {
   

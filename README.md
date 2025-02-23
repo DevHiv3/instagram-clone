@@ -1,4 +1,4 @@
-#  [INSTAGRAM CLONE](https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk)
+#  [INSTAGRAM CLONE](https://expo.dev/artifacts/eas/8y67iCRVMndvK12xbDyuAZ.apk)
 
 A full fledged instagram clone built entirely on JavaScript Tech Stack
 
@@ -10,7 +10,7 @@ A full fledged instagram clone built entirely on JavaScript Tech Stack
 ## APK Link
 
 ```bash
-  https://expo.dev/artifacts/eas/kPDwHCgNtvhvWvTbgMhYTJ.apk
+  https://expo.dev/artifacts/eas/8y67iCRVMndvK12xbDyuAZ.apk
 ```
 
 ## Screenshots  
@@ -43,7 +43,7 @@ A full fledged instagram clone built entirely on JavaScript Tech Stack
 - OTP verification 📲
 
 
-## (TERMS AND CONDITIONS)[https://instagram-clone-qoyv.onrender.com]
+## PLease read the [TERMS AND CONDITIONS](https://instagram-clone-qoyv.onrender.com/terms-and-conditions)
 
 ## Tech Stack
 

@@ -32,6 +32,7 @@ export default async function CreateNotification(req,res){
           return res.status(200).json({ message: "success", notification: notification })
         }
 
+        /*
         const payload = {
           message: {
             token: user.deviceToken,
@@ -41,6 +42,7 @@ export default async function CreateNotification(req,res){
             },
           },
         };
+        */
 
         // Expo push Token
         
@@ -73,8 +75,6 @@ export default async function CreateNotification(req,res){
             console.error("Failed to send notifications:", responseData);
           }
             /*
-        
-        
           const response = await fetch(FCM_URL, {
             method: 'POST',
             headers: {

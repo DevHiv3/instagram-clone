@@ -15,6 +15,7 @@ import * as Notifications from 'expo-notifications';
 import { base_url as url } from '../slices/authSlice'
 import Modal from '../components/modal';
 import 'firebase/messaging';
+import * as WebBrowser from 'expo-web-browser';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import tw from "twrnc"
 
@@ -84,6 +85,10 @@ export default function SettingsScreen(){
             ToastAndroid.show("Logged out!", ToastAndroid.SHORT)
             navigation.replace('Signup'); 
         };
+
+      const openBrowser = async ()=>{
+        await WebBrowser.openBrowserAsync('https://instagram-clone-qoyv.onrender.com/terms-and-conditions');
+      }
 
     useLayoutEffect(()=>{
         navigation.setOptions({
@@ -300,7 +305,7 @@ export default function SettingsScreen(){
                 <Switch rackcolor={{ false: "#767775", true: "#81b0ff" }} thumbColor={turn ? "#fff" : "#f4f3f4"} value={turn} onValueChange={getNotification} />
             </View>
         </TouchableOpacity>
-        <TouchableOpacity style={tw`flex flex-col justify-center mt-2 mb-2`}>
+        <TouchableOpacity style={tw`flex flex-col justify-center mt-2 mb-6`}>
             <View style={tw`flex flex-row justify-between items-center ml-4`}>
                 <View style={tw`flex flex-row`}>
                 <MaterialCommunityIcons name="clock-time-seven-outline" size={24} color="white" />
@@ -411,6 +416,21 @@ export default function SettingsScreen(){
                 <MaterialIcons name="arrow-forward-ios" size={18} color="gray" /> 
             </View>
         </TouchableOpacity>
+
+        </View>
+
+        <View style={tw`border-gray-900 border-t-8`}>
+          <Text style={tw`text-gray-400 mt-2 ml-4 mt-4 mb-4 text-md font-bold`}>Read our terms and conditions</Text>
+
+          <TouchableOpacity onPress={openBrowser} style={tw`flex flex-col justify-center mt-2 mb-6`}>
+              <View style={tw`flex flex-row justify-between items-center ml-4`}>
+                  <View style={tw`flex flex-row`}>
+                  <Ionicons name="lock-closed-outline" size={24} color="white" />
+                      <Text style={tw`text-white text-lg ml-2`}> Terms and conditions </Text>
+                  </View>
+                  <MaterialIcons name="arrow-forward-ios" size={18} color="gray" /> 
+              </View>
+          </TouchableOpacity>
 
         </View>
 

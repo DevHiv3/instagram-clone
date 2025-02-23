@@ -22,7 +22,7 @@ function Navbar(){
         <div className="flex flex-row justify-center items-center sm:px-10 px-2 text-xs">
           
           <Image
-            src="https://blue-parental-mackerel-801.mypinata.cloud/ipfs/bafybeidvpeaznv4pcszj2zljhhmnwyridf2lgul73h3yt674u22eskixbm"
+            src="/splash-screen-logo.webp"
             alt="Instagram Clone Logo"
             width={30}  // Adjust size
             height={30} // Adjust size

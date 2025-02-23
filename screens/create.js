@@ -83,18 +83,6 @@ export default function CreateScreen(){
             }
           }
 
-          const post = async ()=> {
-            if(!selectedMedia){
-              console.log(selectedMedia)
-              ToastAndroid.show("Image not selected!", ToastAndroid.SHORT)
-              return;
-            }
-
-            console.log(selectedMedia)
-            navigation.navigate("Finalize-Post", { photo: selectedMedia })
-            
-          }
-
           useLayoutEffect(()=>{
             navigation.setOptions({
               title: "Post",
@@ -109,7 +97,7 @@ export default function CreateScreen(){
                 fontWeight: "bold"
               },
               headerLeft: ()=> <TouchableOpacity onPress={()=> navigation.goBack()}><Ionicons name="arrow-back" size={24} color="white" /></TouchableOpacity>,
-              headerRight: ()=> <TouchableOpacity onPress={post}><Text style={tw`font-bold text-blue-400 text-sm`}>Next</Text></TouchableOpacity>,
+              headerRight: ()=> <TouchableOpacity><Text style={tw`font-bold text-blue-400 text-sm`}>Next</Text></TouchableOpacity>,
         
             })
           },[])

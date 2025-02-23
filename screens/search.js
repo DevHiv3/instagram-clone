@@ -246,7 +246,7 @@ const UserList = ({ user }) =>(
       <TouchableOpacity onPress={()=> navigation.navigate("Home")}><Octicons name="home" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Search")}><AntDesign name="search1" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=> navigation.navigate("Create")}><FontAwesome name="plus-square-o" size={30} color="white" /></TouchableOpacity>
-      <TouchableOpacity onPress={()=> navigation.navigate("Notification")}><AntDesign name="hearto" size={30} color="white" /></TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Reels")}><Octicons name="video" size={30} color="white" /></TouchableOpacity>
       <TouchableOpacity onPress={()=>{ navigation.navigate("Profile", { id: userId })}}><Image style={tw`h-8 w-8 rounded-full`} source={{ uri: profile.photo }} /></TouchableOpacity>
     </View>
 

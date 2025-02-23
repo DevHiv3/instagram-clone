@@ -11,7 +11,7 @@
 
 # Ignore node_modules directories
 node_modules/
-
+**/google-services.json
 # Expo
 .expo/
 dist/

@@ -26,6 +26,10 @@ import FinalizePostScreen from './screens/finalize-post';
 import CreateStory from './screens/create-story';
 import PhotoScreen from './screens/photo';
 import AboutScreen from './screens/about';
+import ReelScreen from './screens/reel';
+import ReelsScreen from './screens/reels';
+import CreateReelScreen from "./screens/create-reel"
+import FinalizeReelScreen from './screens/finalize-reel';
 
 const Stack = createNativeStackNavigator()
 
@@ -118,6 +122,10 @@ export default function Navigator() {
                 <Stack.Screen name="Create-Story" component={CreateStory} options={{ headerShown: true }} />
                 <Stack.Screen name="Photo" component={PhotoScreen} options={{ headerShown: true }} />
                 <Stack.Screen name="About" component={AboutScreen} options={{ headerShown: true }} />
+                <Stack.Screen name="Reel" component={ReelScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Reels" component={ReelsScreen} options={{ headerShown: false }} />
+                <Stack.Screen name="Create-Reel" component={CreateReelScreen} options={{ headerShown: true }} />
+                <Stack.Screen name="Finalize-Reel" component={FinalizeReelScreen} options={{ headerShown: true }} />
                
           </Stack.Navigator>
         
